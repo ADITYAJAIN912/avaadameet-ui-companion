@@ -1,11 +1,16 @@
-import { ChevronRight, Users } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import type { Meeting } from '../../types/meeting'
 import { isMeetingPastOrCompleted } from '../../utils/meetings'
+import {
+  formatDuration,
+  getMeetingDurationMinutes,
+  getPlatformLabel,
+  getStartsInLabel,
+} from '../../utils/meetingMeta'
 import { AvatarGroup } from '../ui/AvatarGroup'
 import { Toggle } from '../ui/Toggle'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
-import { MeetingMetadata } from '../ui/MeetingMetadata'
 import { getDisplayAttendees } from '../../utils/meetingDisplay'
 
 interface MeetingCardProps {
@@ -16,44 +21,83 @@ interface MeetingCardProps {
 export function MeetingCard({ meeting, onAutoJoinChange }: MeetingCardProps) {
   const isPast = isMeetingPastOrCompleted(meeting)
   const displayAttendees = getDisplayAttendees(meeting)
+  const duration = formatDuration(getMeetingDurationMinutes(meeting))
+  const platform = getPlatformLabel(meeting.source)
+  const startsIn = !isPast ? getStartsInLabel(meeting) : null
 
   return (
     <Card
       variant="interactive"
-      className={`flex flex-col p-4 ${isPast ? 'row-completed' : ''}`}
+      className={`flex min-h-[6.25rem] flex-col p-2.5 ${isPast ? 'row-completed' : ''}`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="truncate text-body font-medium text-neutral-text">{meeting.title}</p>
-        {isPast && <Badge variant="completed">Completed</Badge>}
-      </div>
-      <MeetingMetadata meeting={meeting} showStartsIn={!isPast} className="mt-1" />
-      <div className="mt-2 flex items-center gap-2 text-caption text-neutral-muted">
-        <span className="flex items-center gap-0.5">
-          <Users className="h-3 w-3" />
-          {displayAttendees.length}
-        </span>
-        {!isPast && <Badge variant="source">{meeting.source}</Badge>}
-      </div>
-      <div className="mt-3 flex items-center justify-between border-t border-neutral-border pt-3">
-        {!isPast ? (
-          <Toggle
-            checked={meeting.autoJoin}
-            onChange={(v) => onAutoJoinChange(meeting.id, v)}
-            label="Auto Join"
-          />
-        ) : (
-          <span className="text-caption text-neutral-muted">Completed</span>
-        )}
-        <button
-          type="button"
-          className="focus-ring rounded-lg p-1.5 text-neutral-muted ease-premium hover:bg-neutral-bg"
-          aria-label="Meeting details"
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <p className="line-clamp-2 text-body font-medium leading-snug text-neutral-text">
+            {meeting.title}
+          </p>
+          {isPast && (
+            <Badge variant="completed" className="shrink-0 text-[10px]">
+              Completed
+            </Badge>
+          )}
+        </div>
+
+        <p
+          className={`mt-0.5 text-caption font-semibold tabular-nums ${
+            isPast ? 'text-neutral-muted' : 'text-neutral-text'
+          }`}
         >
-          <ChevronRight className="h-4 w-4" />
-        </button>
+          {meeting.time}
+        </p>
+
+        <p className="mt-0.5 truncate text-[11px] text-neutral-muted">
+          <span>{meeting.host}</span>
+          <span className="text-neutral-border"> · </span>
+          <span>{duration}</span>
+          <span className="text-neutral-border"> · </span>
+          <span>{platform}</span>
+          <span className="text-neutral-border"> · </span>
+          <span>
+            {displayAttendees.length} attendee{displayAttendees.length !== 1 ? 's' : ''}
+          </span>
+          {startsIn && (
+            <>
+              <span className="text-neutral-border"> · </span>
+              <span className="font-medium text-brand-teal">{startsIn}</span>
+            </>
+          )}
+        </p>
       </div>
-      <div className="mt-3">
-        <AvatarGroup attendees={displayAttendees} max={3} />
+
+      <div className="mt-1.5 flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1">
+          {!isPast && (
+            <>
+              <span className="shrink-0 text-[11px] text-neutral-muted">Auto Join</span>
+              <span className="text-neutral-border/80" aria-hidden>
+                |
+              </span>
+              <Toggle
+                checked={meeting.autoJoin}
+                onChange={(v) => onAutoJoinChange(meeting.id, v)}
+                ariaLabel={`Auto join ${meeting.title}`}
+                size="sm"
+              />
+              <span className="mx-0.5 text-neutral-border/80" aria-hidden>
+                |
+              </span>
+            </>
+          )}
+          <button
+            type="button"
+            className="focus-ring inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-neutral-muted ease-premium hover:bg-neutral-bg hover:text-neutral-text"
+            aria-label={`Open ${meeting.title}`}
+          >
+            <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+          </button>
+        </div>
+
+        <AvatarGroup attendees={displayAttendees} max={3} size="sm" />
       </div>
     </Card>
   )

@@ -1,4 +1,4 @@
-import type { ActionItem } from '../../data/mockActionItems'
+import type { ActionItem } from '../../types/actionItem'
 import { KanbanColumn } from './KanbanColumn'
 
 const columns: ActionItem['status'][] = ['Pending', 'In Process', 'Blocked', 'Done']
@@ -9,7 +9,7 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ items }: KanbanBoardProps) {
   return (
-    <div className="flex gap-4 overflow-x-auto pb-2">
+    <div className="flex gap-2.5 overflow-x-auto pb-1">
       {columns.map((status) => (
         <KanbanColumn
           key={status}

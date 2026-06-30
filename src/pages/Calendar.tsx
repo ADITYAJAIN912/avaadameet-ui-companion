@@ -1,86 +1,190 @@
-import { Calendar, CalendarDays, Mail } from 'lucide-react'
-import { EmptyState } from '../components/ui/EmptyState'
-import { Card } from '../components/ui/Card'
+import { useMemo, useState } from 'react'
+import { TODAY } from '../data/constants'
+import { getCalendarEvents } from '../data/mockCalendarEvents'
+import { mockActionItems } from '../data/mockActionItems'
+import type { CalendarEvent, CalendarFilterCategory, CalendarViewMode } from '../types/calendar'
+import {
+  buildMonthGrid,
+  countEventsInMonth,
+  filterEventsByCategory,
+  formatMonthYear,
+  getEventsForDate,
+  getUpcomingMeetings,
+  getWeekDates,
+  parseYearMonth,
+  shiftMonth,
+  toIsoMonth,
+} from '../utils/calendar'
+import { CalendarToolbar } from '../components/calendar/CalendarToolbar'
+import { MonthGrid } from '../components/calendar/MonthGrid'
+import { WeekView } from '../components/calendar/WeekView'
+import { DayView } from '../components/calendar/DayView'
+import { CalendarSidebar } from '../components/calendar/CalendarSidebar'
+import { ExecutiveBriefSidebar } from '../components/calendar/ExecutiveBriefSidebar'
 import { CalendarPageSkeleton } from '../components/ui/Skeleton'
 import { usePageLoading } from '../hooks/usePageLoading'
 
-const integrations = [
-  { name: 'Google Calendar', icon: Calendar },
-  { name: 'Outlook', icon: Mail },
-  { name: 'Microsoft Teams', icon: CalendarDays },
-]
+const initial = parseYearMonth(TODAY.slice(0, 7))
 
 export function CalendarPage() {
   const isLoading = usePageLoading(350)
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  const today = 29
+  const allEvents = useMemo(() => getCalendarEvents(), [])
+
+  const [year, setYear] = useState(initial.year)
+  const [month, setMonth] = useState(initial.month)
+  const [selectedDate, setSelectedDate] = useState(TODAY)
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+  const [view, setView] = useState<CalendarViewMode>('month')
+  const [categoryFilter, setCategoryFilter] = useState<CalendarFilterCategory>('all')
+
+  const filteredEvents = useMemo(
+    () => filterEventsByCategory(allEvents, categoryFilter),
+    [allEvents, categoryFilter],
+  )
+
+  const monthCells = useMemo(() => buildMonthGrid(year, month), [year, month])
+  const eventCount = countEventsInMonth(filteredEvents, year, month)
+  const dayEvents = useMemo(
+    () => getEventsForDate(filteredEvents, selectedDate),
+    [filteredEvents, selectedDate],
+  )
+  const todayEvents = useMemo(
+    () => getEventsForDate(filteredEvents, TODAY),
+    [filteredEvents],
+  )
+  const upcomingEvents = useMemo(() => {
+    const upcoming = getUpcomingMeetings(filteredEvents, 8)
+    const todayShown = new Set(todayEvents.slice(0, 4).map((e) => e.id))
+    return upcoming.filter((e) => !todayShown.has(e.id)).slice(0, 4)
+  }, [filteredEvents, todayEvents])
+  const weekDates = useMemo(() => getWeekDates(selectedDate), [selectedDate])
+  const selectedEvent = useMemo(
+    () => filteredEvents.find((e) => e.id === selectedEventId) ?? null,
+    [filteredEvents, selectedEventId],
+  )
+
+  const isScheduleView = view === 'week' || view === 'day'
+
+  function goToToday() {
+    const { year: y, month: m } = parseYearMonth(TODAY.slice(0, 7))
+    setYear(y)
+    setMonth(m)
+    setSelectedDate(TODAY)
+    setSelectedEventId(null)
+  }
+
+  function goPrevMonth() {
+    const next = shiftMonth(year, month, -1)
+    setYear(next.year)
+    setMonth(next.month)
+  }
+
+  function goNextMonth() {
+    const next = shiftMonth(year, month, 1)
+    setYear(next.year)
+    setMonth(next.month)
+  }
+
+  function handleSelectDate(date: string) {
+    setSelectedDate(date)
+    setSelectedEventId(null)
+    const { year: y, month: m } = parseYearMonth(date.slice(0, 7))
+    if (toIsoMonth(y, m) !== toIsoMonth(year, month)) {
+      setYear(y)
+      setMonth(m)
+    }
+  }
+
+  function handleSelectEvent(event: CalendarEvent) {
+    setSelectedEventId((prev) => (prev === event.id ? null : event.id))
+    setSelectedDate(event.date)
+  }
 
   if (isLoading) {
     return <CalendarPageSkeleton />
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <EmptyState
-        icon={Calendar}
-        title="Calendar coming soon"
-        description="A unified view of your meetings across connected calendars is on the roadmap. You'll see availability, conflicts, and AvaadaMeet events in one place."
-        actionHint="Connect Google Calendar or Outlook when integrations launch."
-        className="py-14"
-      >
-        <div className="text-left">
-          <p className="mb-3 text-caption font-medium uppercase tracking-wide text-neutral-muted">
-            Upcoming integrations
-          </p>
-          <ul className="space-y-2">
-            {integrations.map(({ name, icon: Icon }) => (
-              <li
-                key={name}
-                className="flex items-center gap-3 rounded-xl border border-neutral-border/70 bg-neutral-bg/40 px-3.5 py-2.5 text-left ease-premium hover:border-brand-teal/20 hover:bg-white hover:shadow-elevation-1"
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-elevation-1 ring-1 ring-neutral-border/50">
-                  <Icon className="h-4 w-4 text-brand-teal" strokeWidth={1.75} />
-                </span>
-                <span className="text-body text-neutral-text">{name}</span>
-                <span className="badge-pill ml-auto bg-neutral-bg text-neutral-muted ring-1 ring-neutral-border/50">
-                  Soon
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </EmptyState>
+    <div className="mx-auto flex h-[calc(100dvh-6.75rem)] max-w-7xl flex-col gap-1.5 overflow-hidden lg:h-[calc(100dvh-6.25rem)] max-lg:h-auto max-lg:overflow-visible">
+      <CalendarToolbar
+        monthLabel={formatMonthYear(year, month)}
+        eventCount={eventCount}
+        view={view}
+        categoryFilter={categoryFilter}
+        onViewChange={setView}
+        onCategoryChange={setCategoryFilter}
+        onToday={goToToday}
+        onPrevMonth={goPrevMonth}
+        onNextMonth={goNextMonth}
+      />
 
-      <Card variant="container" className="p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-section-title">June 2026</h3>
-          <span className="badge-pill bg-neutral-bg text-neutral-muted ring-1 ring-neutral-border/50">
-            Preview
-          </span>
+      <div
+        className={`flex min-h-0 flex-1 overflow-hidden max-lg:min-h-[28rem] max-lg:flex-col ${
+          isScheduleView ? 'gap-1.5' : 'gap-2'
+        }`}
+      >
+        <div
+          className={`min-h-0 overflow-hidden ${
+            isScheduleView ? 'flex-1 lg:w-[79%]' : 'flex-1 lg:w-[70%]'
+          }`}
+        >
+          {view === 'month' && (
+            <MonthGrid
+              cells={monthCells}
+              events={filteredEvents}
+              selectedDate={selectedDate}
+              onSelectDate={handleSelectDate}
+            />
+          )}
+          {view === 'week' && (
+            <WeekView
+              weekDates={weekDates}
+              events={filteredEvents}
+              selectedDate={selectedDate}
+              selectedEventId={selectedEventId}
+              onSelectDate={handleSelectDate}
+              onSelectEvent={handleSelectEvent}
+            />
+          )}
+          {view === 'day' && (
+            <DayView
+              date={selectedDate}
+              events={dayEvents}
+              selectedEventId={selectedEventId}
+              onSelectEvent={handleSelectEvent}
+            />
+          )}
         </div>
-        <div className="grid grid-cols-7 gap-0.5">
-          {days.map((d) => (
-            <div
-              key={d}
-              className="py-1.5 text-center text-caption font-medium text-neutral-muted"
-            >
-              {d}
-            </div>
-          ))}
-          {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => (
-            <div
-              key={day}
-              className={`flex h-9 items-center justify-center rounded-lg text-body ease-premium ${
-                day === today
-                  ? 'bg-brand-teal font-medium text-white shadow-elevation-1'
-                  : 'text-neutral-text hover:bg-neutral-bg/80'
-              }`}
-            >
-              {day}
-            </div>
-          ))}
+
+        <div
+          className={`min-h-0 shrink-0 overflow-hidden max-lg:h-80 ${
+            isScheduleView
+              ? 'lg:w-[21%] lg:min-w-[10.5rem] lg:max-w-[14rem]'
+              : 'lg:w-[30%] lg:min-w-[18rem] lg:max-w-md'
+          }`}
+        >
+          {isScheduleView ? (
+            <ExecutiveBriefSidebar
+              todayEvents={todayEvents}
+              upcomingEvents={upcomingEvents}
+              actionItems={mockActionItems}
+              selectedEvent={selectedEvent}
+            />
+          ) : (
+            <CalendarSidebar
+              year={year}
+              month={month}
+              selectedDate={selectedDate}
+              todayEvents={todayEvents}
+              upcomingEvents={upcomingEvents}
+              actionItems={mockActionItems}
+              onSelectDate={handleSelectDate}
+              onPrevMonth={goPrevMonth}
+              onNextMonth={goNextMonth}
+            />
+          )}
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

@@ -74,9 +74,9 @@ export function ActionItems() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+    <div className="mx-auto max-w-6xl space-y-4">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <SearchInput
             shortcutId="action-items-search"
             placeholder="Search action items or meeting names"

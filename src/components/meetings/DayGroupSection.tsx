@@ -48,7 +48,7 @@ export function DayGroupSection({
           ))}
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((m) => (
             <MeetingCard
               key={m.id}

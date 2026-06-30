@@ -1,11 +1,12 @@
+import { useMemo } from 'react'
 import { Calendar, Mail, CheckSquare, Clock } from 'lucide-react'
 import { StatCard } from '../components/ui/StatCard'
 import { UpcomingSection } from '../components/home/UpcomingRow'
-import { RecentItem } from '../components/home/RecentItem'
-import { PageHeader } from '../components/ui/PageHeader'
+import { ExecutiveSummary } from '../components/home/ExecutiveSummary'
+import { DashboardBriefPanel } from '../components/home/DashboardBriefPanel'
 import { HomePageSkeleton } from '../components/ui/Skeleton'
-import { USER_NAME } from '../data/constants'
-import { getOpenActionCount } from '../data/mockActionItems'
+import { TODAY, USER_NAME } from '../data/constants'
+import { getOpenActionStats, sortActionItems, mockActionItems } from '../data/mockActionItems'
 import { formatLongDate } from '../utils/helpers'
 import { useMeetings } from '../context/MeetingsContext'
 import { usePageLoading } from '../hooks/usePageLoading'
@@ -13,6 +14,7 @@ import { usePageLoading } from '../hooks/usePageLoading'
 export function Home() {
   const isLoading = usePageLoading(400)
   const {
+    meetings,
     upcomingForHome,
     recentToday,
     meetingsThisWeekCount,
@@ -20,44 +22,64 @@ export function Home() {
     updateAutoJoin,
   } = useMeetings()
 
-  const openActions = getOpenActionCount()
+  const actionStats = getOpenActionStats()
+  const meetingsTodayCount = useMemo(
+    () => meetings.filter((m) => m.date === TODAY).length,
+    [meetings],
+  )
+
+  const priorityActions = useMemo(
+    () => sortActionItems(mockActionItems.filter((a) => a.status !== 'Done')).slice(0, 2),
+    [],
+  )
 
   if (isLoading) {
     return <HomePageSkeleton />
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <PageHeader
-        eyebrow="Welcome back,"
-        title={USER_NAME}
-        subtitle={formatLongDate()}
-        compact
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-2.5 lg:max-h-[calc(100dvh-8.25rem)] lg:overflow-hidden">
+      <ExecutiveSummary
+        userName={USER_NAME}
+        dateLabel={formatLongDate()}
+        meetingsToday={meetingsTodayCount}
+        upcomingCount={upcomingTodayCount}
+        openActions={actionStats.total}
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid shrink-0 grid-cols-2 gap-2 lg:grid-cols-4">
         <StatCard
           value={meetingsThisWeekCount}
-          label="Meetings this week"
+          label="Meetings"
           icon={Calendar}
           to="/meetings?filter=this-week"
-          trend="+3 compared to last week"
+          trend="18% vs last week"
           trendPositive
+          caption="Highest this month"
         />
         <StatCard
           value={47}
           label="Emails Delivered"
           icon={Mail}
           to="/meetings"
-          trend="+12% this month"
+          trend="12% this month"
           trendPositive
+          caption="Delivery rate 98.4%"
         />
         <StatCard
-          value={openActions}
-          label="My Open Actions"
+          value={actionStats.total}
+          label="Open Actions"
           icon={CheckSquare}
           to="/action-items?filter=open"
-          trend="3 due today"
+          trend={
+            actionStats.overdue > 0 ? `${actionStats.overdue} overdue` : 'None overdue'
+          }
+          trendNegative={actionStats.overdue > 0}
+          caption={
+            actionStats.dueToday > 0
+              ? `${actionStats.dueToday} due today`
+              : 'No items due today'
+          }
         />
         <StatCard
           value={upcomingTodayCount}
@@ -65,18 +87,22 @@ export function Home() {
           icon={Clock}
           to="/meetings?filter=today"
           trend="Remaining today"
+          caption={`${meetingsTodayCount} scheduled total`}
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <UpcomingSection meetings={upcomingForHome} onAutoJoinChange={updateAutoJoin} />
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2.5 lg:grid-cols-5 lg:gap-3">
+        <UpcomingSection
+          className="order-2 h-full min-h-0 lg:order-1 lg:col-span-3"
+          meetings={upcomingForHome}
+          onAutoJoinChange={updateAutoJoin}
+        />
+        <div className="order-1 h-full min-h-0 lg:order-2 lg:col-span-2">
+          <DashboardBriefPanel
+            recentMeeting={recentToday}
+            priorityActions={priorityActions}
+          />
         </div>
-        {recentToday && (
-          <div className="lg:col-span-1">
-            <RecentItem meeting={recentToday} />
-          </div>
-        )}
       </div>
     </div>
   )

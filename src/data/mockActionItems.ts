@@ -1,4 +1,5 @@
 import type { ActionItem } from '../types/actionItem'
+import { TODAY } from './constants'
 
 export type { ActionItem, ActionItemStatus } from '../types/actionItem'
 
@@ -230,6 +231,13 @@ export const STATUS_ORDER: ActionItem['status'][] = [
 
 export function getOpenActionCount(): number {
   return mockActionItems.filter((a) => a.status !== 'Done').length
+}
+
+export function getOpenActionStats(): { total: number; overdue: number; dueToday: number } {
+  const open = mockActionItems.filter((a) => a.status !== 'Done')
+  const overdue = open.filter((a) => a.date < TODAY).length
+  const dueToday = open.filter((a) => a.date === TODAY).length
+  return { total: open.length, overdue, dueToday }
 }
 
 export function sortActionItems(items: ActionItem[]): ActionItem[] {

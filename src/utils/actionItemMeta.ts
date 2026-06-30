@@ -55,3 +55,22 @@ export function dueToneClass(tone: DueTone): string {
       return 'text-neutral-muted'
   }
 }
+
+export function isActionItemOverdue(item: ActionItem): boolean {
+  if (item.status === 'Done') return false
+  return getRelativeDue(item).tone === 'overdue'
+}
+
+export interface ColumnMetrics {
+  total: number
+  overdue: number
+  highPriority: number
+}
+
+export function getColumnMetrics(items: ActionItem[]): ColumnMetrics {
+  return {
+    total: items.length,
+    overdue: items.filter(isActionItemOverdue).length,
+    highPriority: items.filter((i) => getActionPriority(i) === 'High').length,
+  }
+}
