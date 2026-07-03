@@ -22,22 +22,22 @@ export function ReviewFooter({ recommendations = [] }: ReviewFooterProps) {
       {top.length > 0 && (
         <div className={ws.footerRecs}>
           {top.map((rec) => (
-            <div key={rec.id} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <span className={urgencyTone[rec.urgency]}>{recommendationLabel[rec.type]}</span>
-              <span className={ws.cardTitle}>{rec.title}</span>
-              <span className={`${ws.meta} w-full sm:w-auto`}>
+            <div key={rec.id} className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={urgencyTone[rec.urgency]}>{recommendationLabel[rec.type]}</span>
+                <span className={ws.cardPrimary}>{rec.title}</span>
+              </div>
+              <p className={ws.meta}>
                 {rec.rationale}
-                {rec.businessImpact && (
-                  <span> · {rec.businessImpact}</span>
-                )}
-              </span>
+                {rec.businessImpact && <span> · {rec.businessImpact}</span>}
+              </p>
             </div>
           ))}
         </div>
       )}
 
       <div className={ws.footerBar}>
-        <p className={ws.eyebrow}>What happens next?</p>
+        {top.length === 0 ? <p className={ws.eyebrow}>What happens next?</p> : null}
         <div className={ws.footerActions}>
           <Button variant="primary" className={ws.footerPrimary}>
             <Check className="h-3.5 w-3.5" strokeWidth={1.75} />

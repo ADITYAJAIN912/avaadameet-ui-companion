@@ -17,6 +17,12 @@ interface DecisionIntelligenceSectionProps {
   conflicts: MeetingConflict[]
 }
 
+const approvalLabel = {
+  approved: 'Approved',
+  pending: 'Pending',
+  draft: 'Draft',
+} as const
+
 const approvalTone = {
   approved: wsBadge.accent,
   pending: wsBadge.warning,
@@ -35,7 +41,7 @@ export function DecisionIntelligenceSection({
   if (decisions.length === 0) {
     return (
       <div className={ws.empty}>
-        <p className={ws.sectionTitle}>No decisions recorded</p>
+        <p className={ws.cardTitle}>No decisions recorded</p>
         <p className={`mt-1 ${ws.meta}`}>
           Decisions will appear here once the AI review completes.
         </p>
@@ -47,71 +53,59 @@ export function DecisionIntelligenceSection({
     <div>
       <ConflictAlerts conflicts={conflicts} />
 
-      <div className="space-y-2.5">
+      <div className={ws.cardStack}>
         {decisions.map((decision) => {
           const intel = byId.get(decision.id)
           if (!intel) return null
 
           const linkedRisks = risksForDecision.get(decision.id) ?? []
           const impactLine = synthesizeImpact(intel.businessImpact)
-          const topConfidence = intel.confidence.because.slice(0, 2)
 
           return (
             <article key={decision.id} className={ws.cardLift}>
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <h4 className="text-caption font-semibold leading-snug text-neutral-text">
-                  {decision.title}
-                </h4>
+              <div className={ws.cardHd}>
+                <h4 className={ws.cardTitle}>{decision.title}</h4>
                 <span className={priorityBadgeTone(decision.priority)}>{decision.priority}</span>
               </div>
 
-              <p className="mt-1.5 text-small leading-relaxed text-neutral-text">
-                {intel.whyItMatters}
-              </p>
+              <p className={ws.cardPrimary}>{intel.whyItMatters}</p>
 
-              {impactLine && (
-                <p className={`mt-1.5 ${ws.meta}`}>
-                  <span className="font-medium text-neutral-text">Impact:</span> {impactLine}
-                </p>
-              )}
+              <div className={ws.cardSupport}>
+                {impactLine && (
+                  <div className={ws.cardSupportRow}>
+                    <p className={ws.fieldLabel}>Impact</p>
+                    <p className={ws.fieldValue}>{impactLine}</p>
+                  </div>
+                )}
 
-              {linkedRisks.map((risk) => (
-                <InlineRisk key={risk.id} risk={risk} />
-              ))}
+                {linkedRisks.map((risk) => (
+                  <InlineRisk key={risk.id} risk={risk} />
+                ))}
 
-              {linkedRisks.length === 0 && intel.potentialRisks[0] && (
-                <p className={`mt-1.5 ${ws.meta}`}>
-                  <span className="font-medium text-status-warning">Risk:</span>{' '}
-                  {intel.potentialRisks[0]}
-                </p>
-              )}
+                {linkedRisks.length === 0 && intel.potentialRisks[0] && (
+                  <div className={ws.cardSupportRow}>
+                    <p className={ws.fieldLabel}>Risk</p>
+                    <p className={ws.contextItem}>{intel.potentialRisks[0]}</p>
+                  </div>
+                )}
 
-              <p className="mt-2 text-small leading-snug text-neutral-text">
-                <span className="font-medium text-brand-teal">Recommend:</span>{' '}
-                {intel.aiRecommendation}
-              </p>
+                <div className={ws.cardSupportRow}>
+                  <p className={ws.fieldLabel}>Recommend</p>
+                  <p className={ws.fieldValue}>{intel.aiRecommendation}</p>
+                </div>
+              </div>
 
-              {topConfidence.length > 0 && (
-                <p className={`mt-1.5 ${ws.meta}`}>
-                  {intel.confidence.level} confidence — {topConfidence.join('; ')}
-                </p>
-              )}
-
-              <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-neutral-border/25 pt-2 text-micro text-neutral-text/80">
-                <span className="font-semibold text-neutral-text">{decision.owner}</span>
-                <span aria-hidden>·</span>
-                <span className="font-medium text-neutral-text/85">{decision.relatedProject}</span>
+              <div className={ws.cardFt}>
+                <span className={ws.metaStrong}>{decision.owner}</span>
+                <span className={ws.meta}>{decision.relatedProject}</span>
                 <span className={approvalTone[decision.approvalStatus]}>
-                  {decision.approvalStatus}
+                  {approvalLabel[decision.approvalStatus]}
                 </span>
                 {intel.dependencies[0] && (
-                  <>
-                    <span aria-hidden>·</span>
-                    <span>Depends: {intel.dependencies[0]}</span>
-                  </>
+                  <span className={ws.meta}>Depends on {intel.dependencies[0]}</span>
                 )}
                 {decision.timestamp !== '—' && (
-                  <span className="ml-auto tabular-nums">{decision.timestamp}</span>
+                  <span className={`tabular-nums ${ws.meta}`}>{decision.timestamp}</span>
                 )}
               </div>
             </article>

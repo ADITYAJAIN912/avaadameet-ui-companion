@@ -109,7 +109,7 @@ export function ExecutiveMeetingWorkspace({ meetings }: ExecutiveMeetingWorkspac
       />
 
       <div className={workspaceLayout.gridMeetings}>
-          <div className="flex max-h-[42vh] min-h-0 shrink-0 flex-col lg:max-h-none lg:min-h-0">
+          <div className="flex min-h-0 flex-1 flex-col">
             <AttentionQueue
               meetings={filteredMeetings}
               selectedMeetingId={selectedMeetingId}

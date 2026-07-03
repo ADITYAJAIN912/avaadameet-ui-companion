@@ -143,4 +143,64 @@
   .nav-item-active {
     @apply bg-brand-tealLight/80 font-medium text-brand-teal;
   }
+
+  /* ─── Enterprise polish (app shell + dashboard) ───────────────── */
+  .dash-panel-hd {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    border-bottom: 1px solid var(--divider-subtle);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .dash-section {
+    border-top: 1px solid var(--divider-subtle);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .dash-count {
+    display: inline-flex;
+    height: 1.25rem;
+    min-width: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: var(--color-brand-teal-muted);
+    padding-inline: var(--space-1-5);
+    font-size: var(--font-size-micro);
+    font-weight: var(--font-weight-medium);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-brand-teal);
+  }
+
+  .icon-well {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-brand-teal-muted) 65%, transparent);
+    color: var(--color-brand-teal);
+  }
+
+  .icon-well-neutral {
+    background: color-mix(in srgb, var(--surface-sunken) 80%, transparent);
+    color: var(--text-tertiary);
+  }
+
+  .icon-well-lg {
+    height: 1.75rem;
+    width: 1.75rem;
+  }
+
+  .insight-tile {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--divider-subtle);
+    background: color-mix(in srgb, var(--surface-sunken) 45%, transparent);
+    padding: var(--space-2) var(--space-2-5);
+  }
 }

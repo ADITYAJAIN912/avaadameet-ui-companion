@@ -38,7 +38,7 @@ export function Home() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-2.5 lg:max-h-[calc(100dvh-8.25rem)] lg:overflow-hidden">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 lg:max-h-[calc(100dvh-8.25rem)] lg:overflow-hidden">
       <ExecutiveSummary
         userName={USER_NAME}
         dateLabel={formatLongDate()}
@@ -47,7 +47,7 @@ export function Home() {
         openActions={actionStats.total}
       />
 
-      <div className="grid shrink-0 grid-cols-2 gap-2 lg:grid-cols-4">
+      <div className="grid shrink-0 grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           value={meetingsThisWeekCount}
           label="Meetings"
@@ -91,7 +91,7 @@ export function Home() {
         />
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2.5 lg:grid-cols-5 lg:gap-3">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-5">
         <UpcomingSection
           className="order-2 h-full min-h-0 lg:order-1 lg:col-span-3"
           meetings={upcomingForHome}

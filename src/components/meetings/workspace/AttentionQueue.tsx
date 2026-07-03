@@ -86,7 +86,7 @@ export function AttentionQueue({
             {sections.map((section) => (
               <section key={section.id} aria-label={section.label}>
                 <div className={`${ws.groupHd} ${ws.queueGroupHd}`}>
-                  <h3 className={ws.eyebrow}>{section.label}</h3>
+                  <h3 className={ws.queueEyebrow}>{section.label}</h3>
                   <span className={wsCount}>{section.meetings.length}</span>
                 </div>
 

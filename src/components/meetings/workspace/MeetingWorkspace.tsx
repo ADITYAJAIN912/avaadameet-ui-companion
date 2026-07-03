@@ -66,9 +66,8 @@ export function MeetingWorkspace({ context }: MeetingWorkspaceProps) {
       {context ? (
         <div key={context.id} className={`flex min-h-0 flex-1 flex-col ${ws.contextEnter}`}>
           <div className={ws.panelHd}>
-            <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="min-w-0 flex-1">
-                <p className={ws.eyebrow}>AI review workspace</p>
                 <h2 className={ws.workspaceTitle}>{context.title}</h2>
                 <p className={ws.meta}>
                   <span className={`tabular-nums ${ws.metaStrong}`}>
@@ -92,8 +91,8 @@ export function MeetingWorkspace({ context }: MeetingWorkspaceProps) {
           </div>
         </div>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col px-4 py-5">
-          <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className={`mx-auto flex w-full max-w-lg flex-1 flex-col justify-center ${ws.panelBdEmpty}`}>
             <WorkspaceEmptyState
               icon={<LayoutTemplate className="h-5 w-5" strokeWidth={1.75} aria-hidden />}
               title="Select a meeting"
@@ -101,15 +100,15 @@ export function MeetingWorkspace({ context }: MeetingWorkspaceProps) {
               className="border-0 bg-transparent p-0"
             />
 
-            <ul className="mt-4 space-y-1.5">
+            <ul className="mt-4 space-y-2">
               {emptyStateItems.map(({ icon: Icon, title, description }) => (
-                <li key={title} className={`${ws.cardLift} flex gap-2.5`}>
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/80 text-neutral-muted">
+                <li key={title} className={`${ws.emptyHint} ${ws.cardTimeline}`}>
+                  <div className="icon-well icon-well-neutral icon-well-lg">
                     <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
                   </div>
-                  <div className="min-w-0">
-                    <p className={ws.sectionTitle}>{title}</p>
-                    <p className={`mt-0.5 ${ws.meta}`}>{description}</p>
+                  <div className={ws.cardTimelineBody}>
+                    <p className={ws.cardTitle}>{title}</p>
+                    <p className={ws.meta}>{description}</p>
                   </div>
                 </li>
               ))}

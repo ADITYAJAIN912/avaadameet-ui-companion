@@ -22,9 +22,9 @@ interface ExecutiveBriefSidebarProps {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-neutral-border/50 bg-neutral-bg/40 px-2 py-1.5 text-center">
-      <p className="text-[10px] font-medium text-neutral-muted">{label}</p>
-      <p className="text-caption font-semibold tabular-nums text-neutral-text">{value}</p>
+    <div className="insight-tile text-center">
+      <p className="text-micro font-medium text-neutral-muted">{label}</p>
+      <p className="mt-0.5 text-caption font-semibold tabular-nums text-neutral-text">{value}</p>
     </div>
   )
 }
@@ -41,7 +41,7 @@ function BriefMeetingRow({
 
   return (
     <div
-      className={`rounded-lg border border-neutral-border/50 border-l-[3px] p-2 ${styles.stripe} ${
+      className={`insight-tile border-l-[3px] ${styles.stripe} ${
         isBlock ? 'bg-neutral-bg/50' : 'bg-white'
       }`}
     >
@@ -102,33 +102,35 @@ export function ExecutiveBriefSidebar({
 
   return (
     <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
-      <header className="shrink-0 border-b border-neutral-border/50 bg-neutral-bg/25 p-2">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-muted">
-          Executive Daily Brief
-        </p>
-        <div className="mt-1.5 grid grid-cols-3 gap-1">
-          <StatPill label="Meetings" value={String(meetings.length)} />
-          <StatPill label="Focus" value={formatScheduledDuration(focusMinutes)} />
-          <StatPill label="Actions" value={String(pendingActions.length)} />
+      <header className="dash-panel-hd bg-neutral-bg/25">
+        <div className="w-full">
+          <p className="text-micro font-semibold uppercase tracking-widest text-neutral-muted">
+            Executive Daily Brief
+          </p>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            <StatPill label="Meetings" value={String(meetings.length)} />
+            <StatPill label="Focus" value={formatScheduledDuration(focusMinutes)} />
+            <StatPill label="Actions" value={String(pendingActions.length)} />
+          </div>
+          <p className="mt-2 text-small text-neutral-muted">
+            <Clock className="mr-1 inline h-3.5 w-3.5 align-[-2px]" strokeWidth={1.75} />
+            {formatScheduledDuration(meetingMinutes)} in meetings today
+          </p>
         </div>
-        <p className="mt-1.5 text-[11px] text-neutral-muted">
-          <Clock className="mr-1 inline h-3 w-3" strokeWidth={1.75} />
-          {formatScheduledDuration(meetingMinutes)} in meetings today
-        </p>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {selectedEvent && (
-          <section className="border-b border-brand-teal/20 bg-brand-tealLight/25 p-2">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-brand-teal">
+          <section className="border-b border-brand-teal/20 bg-brand-tealLight/25 px-4 py-3">
+            <p className="mb-1.5 text-micro font-semibold uppercase tracking-wide text-brand-teal">
               Selected
             </p>
             <BriefMeetingRow event={selectedEvent} />
           </section>
         )}
 
-        <section className="border-b border-neutral-border/50 p-2">
-          <h3 className="mb-1.5 text-caption font-semibold text-neutral-text">Today&apos;s Agenda</h3>
+        <section className="dash-section">
+          <h3 className="mb-2 text-caption font-semibold text-neutral-text">Today&apos;s Agenda</h3>
           {todayEvents.length === 0 ? (
             <p className="rounded-lg bg-neutral-bg/60 py-4 text-center text-caption text-neutral-muted">
               Clear schedule today
@@ -147,8 +149,8 @@ export function ExecutiveBriefSidebar({
           )}
         </section>
 
-        <section className="border-b border-neutral-border/50 p-2">
-          <h3 className="mb-1.5 text-caption font-semibold text-neutral-text">Upcoming Meetings</h3>
+        <section className="dash-section">
+          <h3 className="mb-2 text-caption font-semibold text-neutral-text">Upcoming Meetings</h3>
           {upcomingEvents.length === 0 ? (
             <p className="text-caption text-neutral-muted">Nothing ahead on the calendar</p>
           ) : (
@@ -160,24 +162,21 @@ export function ExecutiveBriefSidebar({
           )}
         </section>
 
-        <section className="border-b border-neutral-border/50 p-2">
-          <h3 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-neutral-text">
+        <section className="dash-section">
+          <h3 className="mb-2 flex items-center gap-1.5 text-caption font-semibold text-neutral-text">
             <ListTodo className="h-3.5 w-3.5" strokeWidth={1.75} />
             Pending Action Items
           </h3>
           {pendingActions.length === 0 ? (
             <p className="text-caption text-neutral-muted">All caught up</p>
           ) : (
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {pendingActions.slice(0, 3).map((item) => (
-                <li
-                  key={item.id}
-                  className="rounded-lg border border-neutral-border/50 bg-neutral-bg/40 px-2.5 py-2"
-                >
+                <li key={item.id} className="insight-tile">
                   <p className="truncate text-caption font-medium text-neutral-text">
                     {item.meetingTitle}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-neutral-muted">
+                  <p className="mt-1 text-small text-neutral-muted">
                     {item.openCount} open · {item.status}
                   </p>
                 </li>
@@ -186,22 +185,22 @@ export function ExecutiveBriefSidebar({
           )}
           <Link
             to="/action-items"
-            className="focus-ring mt-2 inline-block text-caption font-medium text-brand-teal hover:text-brand-teal/80"
+            className="focus-ring mt-3 inline-block text-caption font-medium text-brand-teal hover:text-brand-teal/80"
           >
             View all →
           </Link>
         </section>
 
-        <section className="p-2">
-          <h3 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-neutral-text">
+        <section className="dash-section border-b-0">
+          <h3 className="mb-2 flex items-center gap-1.5 text-caption font-semibold text-neutral-text">
             <CheckSquare className="h-3.5 w-3.5" strokeWidth={1.75} />
             Meeting Preparation
           </h3>
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {prepItems.map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-2 rounded-lg border border-neutral-border/40 bg-white px-2.5 py-2 text-[11px] text-neutral-text"
+                className="flex items-start gap-2.5 rounded-lg border border-neutral-border/50 bg-white px-2.5 py-2 text-small text-neutral-text"
               >
                 <span className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border border-neutral-border/60" />
                 {item}

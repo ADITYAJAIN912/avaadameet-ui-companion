@@ -19,7 +19,7 @@ export function MeetingWorkspaceContent({ context }: MeetingWorkspaceContentProp
         <BriefSection brief={context.brief} />
       </WorkspaceSection>
 
-      <WorkspaceSection title="Decision flow" question="How did we get here?">
+      <WorkspaceSection title="Decision flow" variant="tier" scrollBody>
         <DecisionFlowSection
           steps={intelligence.narrativeTimeline}
           crossMeeting={intelligence.crossMeeting}
@@ -28,8 +28,9 @@ export function MeetingWorkspaceContent({ context }: MeetingWorkspaceContentProp
 
       <WorkspaceSection
         title="Decision intelligence"
-        question="What decisions actually matter?"
         count={context.decisions.length}
+        variant="tier"
+        scrollBody
       >
         <DecisionIntelligenceSection
           decisions={context.decisions}
@@ -43,6 +44,8 @@ export function MeetingWorkspaceContent({ context }: MeetingWorkspaceContentProp
         title="Action review"
         question="What needs attention?"
         count={context.commitments.length}
+        variant="secondary"
+        scrollBody
       >
         <ActionReviewSection commitments={context.commitments} />
       </WorkspaceSection>

@@ -18,7 +18,7 @@ const trackSize = {
 } as const
 
 const segmentSize = {
-  sm: 'h-6 min-w-[2rem] px-2 text-[11px] rounded-[5px]',
+  sm: 'h-6 min-w-[2rem] px-2 text-small rounded-md',
   md: 'h-8 min-w-[2.25rem] px-2.5 text-caption rounded-md',
 } as const
 

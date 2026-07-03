@@ -1,5 +1,5 @@
 import type { RiskIntelligence } from '../../../../types/decisionIntelligence'
-import { wsBadge } from '../workspaceUi'
+import { ws, wsBadge } from '../workspaceUi'
 
 interface InlineRiskProps {
   risk: RiskIntelligence
@@ -13,20 +13,20 @@ const severityTone = {
 
 export function InlineRisk({ risk }: InlineRiskProps) {
   return (
-    <div className="mt-2 rounded-md bg-white/60 px-2.5 py-2">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className={ws.riskInset}>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className={ws.cardTitle}>{risk.title}</p>
         <span className={severityTone[risk.severity]}>{risk.severity} risk</span>
-        <span className="text-small font-medium text-neutral-text">{risk.title}</span>
       </div>
-      <p className="mt-1 text-small leading-snug text-neutral-text">{risk.businessImpact}</p>
-      <p className="mt-1 text-caption text-neutral-text/80">
-        <span className="font-semibold text-neutral-text">{risk.owner}</span>
+      <p className={ws.contextItem}>{risk.businessImpact}</p>
+      <p className={ws.meta}>
+        <span className={ws.metaStrong}>{risk.owner}</span>
         {' · '}
-        <span className="font-medium text-neutral-text/85">Mitigate:</span> {risk.mitigation}
+        Mitigate: {risk.mitigation}
         {risk.deadline !== '—' && (
           <>
             {' · '}
-            <span className="tabular-nums font-medium text-neutral-text/85">by {risk.deadline}</span>
+            <span className="tabular-nums">by {risk.deadline}</span>
           </>
         )}
       </p>

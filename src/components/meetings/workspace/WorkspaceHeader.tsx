@@ -23,11 +23,12 @@ function CaptureBadge() {
       className="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-surface-sunken/80 px-2.5"
       aria-label="Capture policy placeholder"
     >
-      <Shield className="h-3.5 w-3.5 text-brand-teal" strokeWidth={1.75} aria-hidden />
-      <div className="leading-none">
-        <p className="text-micro font-medium text-neutral-text">Capture</p>
-        <p className="mt-0.5 text-micro text-neutral-muted">Botless default</p>
-      </div>
+      <Shield className="h-3.5 w-3.5 text-neutral-muted" strokeWidth={1.75} aria-hidden />
+      <p className={ws.meta}>
+        <span className={ws.metaStrong}>Capture</span>
+        {' · '}
+        Botless default
+      </p>
     </div>
   )
 }
@@ -50,8 +51,6 @@ export function WorkspaceHeader({
       subtitle={
         <>
           <span className={ws.metaStrong}>{periodLabel}</span>
-          <span className="text-neutral-border"> · </span>
-          Attention, review &amp; commitments
         </>
       }
       leadingExtra={

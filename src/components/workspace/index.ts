@@ -1,3 +1,4 @@
+export { KnowledgeMiniCard } from './KnowledgeMiniCard'
 export { ActionCopilotPanel, AvaadaCopilotPanel, MeetingCopilotPanel } from './copilot'
 export { WorkspaceAiToggle } from './WorkspaceAiToggle'
 export { WorkspaceContextGroupTitle } from './WorkspaceContextGroupTitle'

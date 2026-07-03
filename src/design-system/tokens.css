@@ -35,7 +35,7 @@
   --color-info-muted: #eff6ff;
 
   /* ─── Semantic colors ──────────────────────────────────────────── */
-  --surface-canvas: var(--color-slate-50);
+  --surface-canvas: #f3f4f6;
   --surface-default: var(--color-white);
   --surface-raised: var(--color-white);
   --surface-sunken: var(--color-slate-100);
@@ -56,6 +56,9 @@
   --border-strong: var(--color-slate-300);
   --border-accent: color-mix(in srgb, var(--color-brand-teal) 20%, transparent);
   --border-focus: color-mix(in srgb, var(--color-brand-teal) 40%, transparent);
+
+  --divider-subtle: color-mix(in srgb, var(--border-default) 40%, transparent);
+  --divider-default: color-mix(in srgb, var(--border-default) 58%, transparent);
 
   --interactive-hover: color-mix(in srgb, var(--color-slate-100) 80%, transparent);
   --interactive-active: var(--color-slate-100);
@@ -84,10 +87,12 @@
   --font-size-micro: 0.625rem; /* 10px — labels, badges */
   --font-size-small: 0.6875rem; /* 11px — metadata */
   --font-size-caption: 0.75rem; /* 12px — secondary */
-  --font-size-body: 0.875rem; /* 14px — default */
+  --font-size-meta: 0.8125rem; /* 13px — metadata */
+  --font-size-body: 0.875rem; /* 14px — descriptions */
   --font-size-body-lg: 1rem; /* 16px */
+  --font-size-card-title: 1.0625rem; /* 17px — card headings */
   --font-size-heading-sm: 1.125rem; /* 18px */
-  --font-size-heading-md: 1.25rem; /* 20px */
+  --font-size-heading-md: 1.25rem; /* 20px — section titles */
   --font-size-heading-lg: 1.5rem; /* 24px */
   --font-size-display-sm: 1.875rem; /* 30px — KPI */
   --font-size-display-md: 2rem; /* 32px — page title */
@@ -96,7 +101,9 @@
   --line-height-snug: 1.375;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.625;
+  --line-height-loose: 1.7;
 
+  --font-weight-light: 350;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;

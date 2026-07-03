@@ -1,7 +1,8 @@
-import type { AiConfidence, WorkspaceBrief } from '../../../../types/meetingContext'
-import { ws, wsBadge } from '../workspaceUi'
+import type { AiConfidence } from '../../types/meetingContext'
+import type { WorkspaceBrief } from '../../types/workspace'
+import { ws, wsBadge } from '../meetings/workspace/workspaceUi'
 
-interface BriefSectionProps {
+interface ActionSummarySectionProps {
   brief: WorkspaceBrief
 }
 
@@ -17,13 +18,13 @@ const confidenceTone: Record<AiConfidence, string> = {
   low: wsBadge.neutral,
 }
 
-const detailFields: { key: keyof WorkspaceBrief; label: string }[] = [
-  { key: 'impact', label: 'Impact' },
-  { key: 'keyRisk', label: 'Key risk' },
-  { key: 'nextStep', label: 'Next step' },
+const infoCards = [
+  { key: 'impact' as const, label: 'Impact' },
+  { key: 'keyRisk' as const, label: 'Key risk' },
+  { key: 'nextStep' as const, label: 'Next step' },
 ]
 
-export function BriefSection({ brief }: BriefSectionProps) {
+export function ActionSummarySection({ brief }: ActionSummarySectionProps) {
   return (
     <div className="workspace-hero-surface">
       <div className={ws.heroBodyWithBadge}>
@@ -34,7 +35,7 @@ export function BriefSection({ brief }: BriefSectionProps) {
       </div>
 
       <dl className={ws.summaryInfoGrid}>
-        {detailFields.map(({ key, label }) => (
+        {infoCards.map(({ key, label }) => (
           <div key={label} className={ws.infoCard}>
             <dt className={ws.fieldLabel}>{label}</dt>
             <dd className={ws.infoCardValue}>{brief[key]}</dd>

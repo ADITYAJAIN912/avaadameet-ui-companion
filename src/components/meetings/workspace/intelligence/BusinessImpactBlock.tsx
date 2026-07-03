@@ -19,13 +19,13 @@ export function BusinessImpactBlock({ impact }: BusinessImpactBlockProps) {
   if (filled.length === 0) return null
 
   return (
-    <div className="mt-3">
-      <p className={ws.label}>Business impact</p>
-      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+    <div className={ws.cardSupportRow}>
+      <p className={ws.fieldLabel}>Business impact</p>
+      <dl className={ws.cardMetaGridFlush}>
         {filled.map(({ key, label }) => (
-          <div key={key} className="min-w-0">
-            <dt className="text-micro font-medium text-neutral-muted">{label}</dt>
-            <dd className="mt-0.5 text-small leading-relaxed text-neutral-text">{impact[key]}</dd>
+          <div key={key} className={ws.fieldCell}>
+            <dt className={ws.fieldLabel}>{label}</dt>
+            <dd className={ws.fieldValue}>{impact[key]}</dd>
           </div>
         ))}
       </dl>

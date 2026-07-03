@@ -37,7 +37,7 @@ export function UpcomingRow({ meeting, onAutoJoinChange, isLast = false }: Upcom
       </div>
 
       <div
-        className={`group mb-2 min-w-0 flex-1 rounded-lg px-2 py-1 ease-premium last:mb-0 hover:bg-neutral-bg/60 ${
+        className={`group mb-2 min-w-0 flex-1 rounded-lg px-2.5 py-1.5 ease-premium last:mb-0 hover:bg-neutral-bg/60 ${
           highlight === 'now' ? 'bg-brand-tealLight/40' : highlight === 'soon' ? 'bg-brand-tealLight/20' : ''
         }`}
       >
@@ -47,7 +47,7 @@ export function UpcomingRow({ meeting, onAutoJoinChange, isLast = false }: Upcom
             <p className="mt-0.5 text-caption font-medium tabular-nums text-neutral-text/80">
               {meeting.time}
             </p>
-            <p className="mt-0.5 truncate text-[10px] text-neutral-muted/60 transition-colors duration-150 group-hover:text-neutral-muted group-focus-within:text-neutral-muted max-sm:hidden">
+            <p className="mt-0.5 truncate text-micro text-neutral-muted max-sm:hidden">
               {duration} · {platform} · {attendees.length} attendee
               {attendees.length !== 1 ? 's' : ''}
             </p>
@@ -79,17 +79,15 @@ export function UpcomingSection({
     <section
       className={`panel-surface panel-surface-accent flex h-full min-h-0 flex-col ${className}`}
     >
-      <div className="surface-clip flex min-h-0 flex-1 flex-col p-3">
+      <div className="surface-clip flex min-h-0 flex-1 flex-col p-4">
         <div className="flex shrink-0 items-center justify-between gap-2">
           <h2 className="text-section-title">Upcoming Meetings</h2>
           {meetings.length > 0 && (
-            <span className="rounded-md bg-brand-tealLight/70 px-1.5 py-px text-[10px] font-medium tabular-nums text-brand-teal">
-              {meetings.length}
-            </span>
+            <span className="dash-count">{meetings.length}</span>
           )}
         </div>
 
-        <div className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {meetings.length === 0 ? (
             <EmptyState
               bare
@@ -115,7 +113,7 @@ export function UpcomingSection({
 
         <Link
           to="/meetings"
-          className="focus-ring mt-2 inline-block shrink-0 rounded-md text-[11px] font-medium text-brand-teal ease-premium hover:text-brand-teal/80"
+          className="focus-ring mt-3 inline-block shrink-0 text-small font-medium text-brand-teal ease-premium hover:text-brand-teal/80"
         >
           View all meetings →
         </Link>

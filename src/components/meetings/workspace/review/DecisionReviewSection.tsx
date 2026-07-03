@@ -38,32 +38,30 @@ export function DecisionReviewSection({ decisions }: DecisionReviewSectionProps)
   }
 
   return (
-    <div className="space-y-2">
+    <div className={ws.cardStack}>
       {decisions.map((decision) => (
         <article key={decision.id} className={ws.cardLift}>
-          <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className={ws.cardHd}>
             <p className={ws.cardTitle}>{decision.title}</p>
             <span className={priorityBadgeTone(decision.priority)}>{decision.priority}</span>
           </div>
 
-          <dl className="mt-2.5 grid gap-2 sm:grid-cols-2">
-            <div>
-              <dt className={ws.label}>Owner</dt>
-              <dd className={`mt-0.5 ${ws.metaStrong}`}>{decision.owner}</dd>
+          <dl className={ws.cardMetaGrid}>
+            <div className={ws.fieldCell}>
+              <dt className={ws.fieldLabel}>Owner</dt>
+              <dd className={ws.fieldValue}>{decision.owner}</dd>
             </div>
-            <div>
-              <dt className={ws.label}>Related project</dt>
-              <dd className={`mt-0.5 ${ws.meta}`}>{decision.relatedProject}</dd>
+            <div className={ws.fieldCell}>
+              <dt className={ws.fieldLabel}>Related project</dt>
+              <dd className={ws.fieldValue}>{decision.relatedProject}</dd>
             </div>
-            <div className="sm:col-span-2">
-              <dt className={ws.label}>Business impact</dt>
-              <dd className={`mt-0.5 text-small leading-relaxed text-neutral-text`}>
-                {decision.businessImpact}
-              </dd>
+            <div className={`${ws.fieldCell} ${ws.cardMetaGridSpan2}`}>
+              <dt className={ws.fieldLabel}>Business impact</dt>
+              <dd className={ws.fieldValue}>{decision.businessImpact}</dd>
             </div>
           </dl>
 
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          <div className={ws.cardFt}>
             <span className={approvalTone[decision.approvalStatus]}>
               {approvalLabel[decision.approvalStatus]}
             </span>

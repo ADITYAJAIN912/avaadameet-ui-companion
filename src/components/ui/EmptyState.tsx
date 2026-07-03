@@ -21,15 +21,15 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center px-6 py-12 text-center ${
+      className={`flex flex-col items-center px-6 py-10 text-center ${
         bare ? '' : 'container-surface'
       } ${className}`}
       role="status"
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-tealLight/80 shadow-elevation-1 ring-1 ring-brand-teal/8">
-        <Icon className="h-6 w-6 text-brand-teal" aria-hidden strokeWidth={1.75} />
+      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-tealLight/80 ring-1 ring-brand-teal/8">
+        <Icon className="h-5 w-5 text-brand-teal" aria-hidden strokeWidth={1.75} />
       </div>
-      <h3 className="mt-5 text-card-heading">{title}</h3>
+      <h3 className="mt-4 text-card-heading">{title}</h3>
       {description && (
         <p className="mt-2.5 max-w-md text-body leading-relaxed text-neutral-muted">{description}</p>
       )}

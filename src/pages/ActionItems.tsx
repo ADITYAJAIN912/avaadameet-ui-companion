@@ -1,32 +1,34 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowRight,
-  Bot,
+  BookOpen,
   Check,
   CheckSquare,
-  CircleDot,
+  ChevronRight,
   Clock3,
   FileText,
-  FolderKanban,
   GitBranch,
+  LayoutTemplate,
   Link2,
   ShieldAlert,
   Sparkles,
-  Timer,
   UserRound,
+  Users,
   X,
 } from 'lucide-react'
 import { getActionWorkspaceItems } from '../data/mockActionWorkspace'
+import type { ActionItemStatus } from '../types/actionItem'
 import type { ActionQueueGroup, ActionWorkspaceItem } from '../types/actionWorkspace'
 import { departmentLabel } from '../types/workspace'
 import { SearchInput } from '../components/ui/SearchInput'
 import { SegmentedControl } from '../components/ui/SegmentedControl'
 import { Button } from '../components/ui/Button'
 import { WorkspaceSection } from '../components/meetings/workspace/WorkspaceSection'
+import { ActionSummarySection } from '../components/action-items/ActionSummarySection'
+import { TimelineHighlightsSection } from '../components/meetings/workspace/review/TimelineHighlightsSection'
 import {
+  KnowledgeMiniCard,
   useWorkspaceFloatingPanel,
   WorkspaceAiToggle,
-  WorkspaceContextGroupTitle,
   WorkspaceEmptyState,
   WorkspaceFloatingPanel,
   WorkspacePageHeader,
@@ -43,13 +45,18 @@ import {
 
 type FilterTab = 'all' | 'open' | 'completed'
 
-const TIMELINE_ICONS = [CircleDot, UserRound, Timer, ShieldAlert] as const
-
 const GROUP_LABELS: Record<ActionQueueGroup, string> = {
-  'needs-attention': 'Needs Attention',
+  'needs-attention': 'Needs attention',
   today: 'Today',
-  'this-week': 'This Week',
+  'this-week': 'This week',
   completed: 'Completed',
+}
+
+const queueStatusBadgeTone: Record<ActionItemStatus, string> = {
+  Pending: wsBadge.info,
+  'In Process': wsBadge.accent,
+  Blocked: wsBadge.danger,
+  Done: wsBadge.neutral,
 }
 
 const FILTER_OPTIONS = [
@@ -57,6 +64,51 @@ const FILTER_OPTIONS = [
   { value: 'open', label: 'Open' },
   { value: 'completed', label: 'Completed' },
 ] as const
+
+const statusLabel: Record<ActionItemStatus, string> = {
+  Pending: 'Pending',
+  'In Process': 'In process',
+  Blocked: 'Blocked',
+  Done: 'Done',
+}
+
+const statusTone: Record<ActionItemStatus, string> = {
+  Pending: wsBadge.info,
+  'In Process': wsBadge.accent,
+  Blocked: wsBadge.danger,
+  Done: wsBadge.neutral,
+}
+
+const emptyStateItems = [
+  {
+    icon: Sparkles,
+    title: 'Review action briefings',
+    description: 'Start with outcomes, blockers, and next steps — not raw task lists.',
+  },
+  {
+    icon: CheckSquare,
+    title: 'Approve critical actions',
+    description: 'Confirm ownership, dependencies, and impact before execution.',
+  },
+  {
+    icon: GitBranch,
+    title: 'Track dependencies',
+    description: 'Surface blocked work and related actions across teams.',
+  },
+  {
+    icon: ShieldAlert,
+    title: 'Monitor execution risks',
+    description: 'Review timeline activity and approval requirements early.',
+  },
+] as const
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('')
+}
 
 interface ActionAiPanelProps {
   item: ActionWorkspaceItem
@@ -99,6 +151,7 @@ export function ActionItems() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<FilterTab>('all')
   const items = useMemo(() => getActionWorkspaceItems(), [])
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
@@ -126,11 +179,23 @@ export function ActionItems() {
     () => filtered.find((item) => item.id === selectedId) ?? filtered[0] ?? null,
     [filtered, selectedId],
   )
-  const timelineRows = selected?.timeline ?? []
+  const timelineHighlights = useMemo(
+    () =>
+      (selected?.timeline ?? []).map((row) => ({
+        id: row.id,
+        time: row.time,
+        label: row.event,
+      })),
+    [selected?.timeline],
+  )
 
   useEffect(() => {
     if (selected && selected.id !== selectedId) setSelectedId(selected.id)
   }, [selected, selectedId])
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [selected?.id])
 
   const [aiOpen, setAiOpen] = useState(false)
   const { panelRef, width: aiWidth, position: aiPos, startDrag, startResize } = useWorkspaceFloatingPanel({
@@ -138,15 +203,20 @@ export function ActionItems() {
     enabled: Boolean(selected),
   })
 
+  const linkedCount = selected
+    ? selected.context.linkedMeetings.length + selected.context.linkedDecisions.length
+    : 0
+  const dependencyCount = selected
+    ? selected.dependencies.length + selected.context.dependencies.length
+    : 0
+
   return (
-    <div className={workspaceLayout.pageShell}>
+    <div className={`${workspaceLayout.pageShell} ${ws.pageActionItems}`}>
       <WorkspacePageHeader
-        title="Action Workspace"
+        title="Action Items"
         subtitle={
           <>
             <span className={ws.metaStrong}>Execution tracking</span>
-            <span className="text-neutral-border"> · </span>
-            Approvals, dependencies & owner follow-through
           </>
         }
         toolbar={
@@ -162,7 +232,7 @@ export function ActionItems() {
               onChange={(value) => setFilter(value as FilterTab)}
               ariaLabel="Action filter"
             />
-            <div className="w-full min-w-[12rem] flex-1 sm:w-56 sm:flex-none lg:w-64">
+            <div className="w-full min-w-[12rem] flex-1 sm:w-52 sm:flex-none lg:w-56 xl:w-64">
               <SearchInput
                 placeholder="Search actions or owners…"
                 value={search}
@@ -175,11 +245,16 @@ export function ActionItems() {
       />
 
       <div className={workspaceLayout.grid}>
-        <aside className="panel-surface flex min-h-0 flex-col">
+        <aside
+          className="panel-surface flex h-full min-h-0 min-w-0 w-full flex-col"
+          aria-label="Action queue"
+        >
           <div className={ws.panelHd}>
-            <h2 className={ws.panelTitle}>Action Queue</h2>
+            <h2 className={ws.panelTitle}>Action queue</h2>
             <p className={ws.meta}>
-              <span className="tabular-nums">{filtered.length}</span> action items in view
+              <span className={`tabular-nums ${ws.metaStrong}`}>{filtered.length}</span>
+              {' '}
+              action item{filtered.length !== 1 ? 's' : ''} in view
             </p>
           </div>
           <div className={ws.panelBd}>
@@ -188,9 +263,9 @@ export function ActionItems() {
                 const itemsInGroup = grouped[group]
                 if (itemsInGroup.length === 0) return null
                 return (
-                  <section key={group}>
+                  <section key={group} aria-label={GROUP_LABELS[group]}>
                     <div className={`${ws.groupHd} ${ws.queueGroupHd}`}>
-                      <h3 className={ws.eyebrow}>{GROUP_LABELS[group]}</h3>
+                      <h3 className={ws.queueEyebrow}>{GROUP_LABELS[group]}</h3>
                       <span className={wsCount}>{itemsInGroup.length}</span>
                     </div>
                     <div className={ws.queueList}>
@@ -201,27 +276,38 @@ export function ActionItems() {
                           onClick={() => setSelectedId(item.id)}
                           className={queueCardClass(selected?.id === item.id)}
                         >
-                          <p className={ws.queueCardTitle}>{item.title}</p>
-                          <p className={ws.queueCardMeta}>
-                            <span className={ws.queueCardMetaStrong}>{item.owner}</span>
-                            <span className="text-neutral-border/80"> · </span>
-                            <span className="tabular-nums">{item.dueDate}</span>
-                          </p>
-                          <div className={ws.queueCardBadges}>
-                            <span className={wsBadge.neutral}>{item.status}</span>
-                            <span className={priorityBadgeTone(item.priority)}>{item.priority}</span>
-                            {item.aiGenerated ? (
-                              <span className={wsBadge.accent}>AI</span>
+                          <div className={ws.queueCardBody}>
+                            <p className={ws.queueCardTitle}>{item.title}</p>
+                            <p className={ws.queueCardOwner}>
+                              <span className={ws.queueCardMetaStrong}>{item.owner}</span>
+                              <span className="text-neutral-border/80"> · </span>
+                              <span>{departmentLabel[item.department]}</span>
+                            </p>
+                            {selected?.id !== item.id ? (
+                              <div className={ws.queueCardStatus} aria-label="Status">
+                                <span className={queueStatusBadgeTone[item.status]}>{statusLabel[item.status]}</span>
+                                {item.priority !== 'low' ? (
+                                  <span className={`${priorityBadgeTone(item.priority)} capitalize`}>
+                                    {item.priority}
+                                  </span>
+                                ) : null}
+                              </div>
                             ) : null}
-                          </div>
-                          <div className={ws.queueCardProgress}>
-                            <div className={ws.progressTrack}>
-                              <div
-                                className={ws.progressFill}
-                                style={{ width: `${item.progress}%` }}
-                              />
-                            </div>
-                            <span className={ws.queueCardProgressLabel}>{item.progress}%</span>
+                            {selected?.id !== item.id ? (
+                              <div className={ws.queueCardProgress} aria-label={`${item.progress}% complete`}>
+                                <div className={ws.progressTrack}>
+                                  <div
+                                    className={ws.progressFill}
+                                    style={{ width: `${item.progress}%` }}
+                                  />
+                                </div>
+                                <span className={ws.queueCardProgressLabel}>{item.progress}%</span>
+                              </div>
+                            ) : null}
+                            <p className={ws.queueCardFoot}>
+                              Due <span className="tabular-nums">{item.dueDate}</span>
+                              {item.aiGenerated ? ' · AI generated' : ''}
+                            </p>
                           </div>
                         </button>
                       ))}
@@ -233,273 +319,313 @@ export function ActionItems() {
           </div>
         </aside>
 
-        <main className="panel-surface flex min-h-0 flex-col" aria-label="Action workspace">
+        <main className="panel-surface flex min-h-0 min-w-0 w-full flex-col" aria-label="Action workspace">
           {selected ? (
-            <>
+            <div key={selected.id} className={`flex min-h-0 flex-1 flex-col ${ws.contextEnter}`}>
               <div className={ws.panelHd}>
-                <p className={ws.eyebrow}>Action execution workspace</p>
-                <h2 className={ws.workspaceTitle}>{selected.title}</h2>
-                <p className={ws.meta}>
-                  {selected.owner}
-                  <span className="text-neutral-border/80"> · </span>
-                  {departmentLabel[selected.department]}
-                  <span className="text-neutral-border/80"> · </span>
-                  {selected.project}
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <h2 className={ws.workspaceTitle}>{selected.title}</h2>
+                    <p className={ws.meta}>
+                      <span className={`tabular-nums ${ws.metaStrong}`}>{selected.owner}</span>
+                      <span className="text-neutral-border/80"> · </span>
+                      {departmentLabel[selected.department]}
+                      <span className="text-neutral-border/80"> · </span>
+                      {selected.project}
+                    </p>
+                  </div>
+                  <span className={`shrink-0 normal-case tracking-normal ${statusTone[selected.status]}`}>
+                    {statusLabel[selected.status]}
+                  </span>
+                </div>
               </div>
-              <div className={ws.panelBd}>
-                <div className={ws.flow}>
-                  <WorkspaceSection title="Summary" question="What is happening?">
-                    <div className="workspace-hero-surface">
-                      <div className={ws.heroHeader}>
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-white/80 text-brand-teal">
-                            <Sparkles className="h-3 w-3" strokeWidth={1.75} aria-hidden />
-                          </div>
-                          <p className={ws.heroKicker}>Action briefing</p>
+
+              <div className="flex min-h-0 flex-1 flex-col">
+                <div ref={scrollRef} className={ws.panelBd}>
+                  <div className={ws.flow}>
+                    <WorkspaceSection title="Summary" question="What is happening?" variant="hero">
+                      <ActionSummarySection brief={selected.brief} />
+                    </WorkspaceSection>
+
+                    <WorkspaceSection title="Action review" variant="secondary" scrollBody>
+                      <div className={ws.actionReviewPanel}>
+                        <div className={ws.cardHd}>
+                          {selected.review.approvalRequired ? (
+                            <span className={wsBadge.warning}>Pending approval</span>
+                          ) : (
+                            <span className={wsBadge.neutral}>Ready to execute</span>
+                          )}
                         </div>
-                        <span className={priorityBadgeTone(selected.priority)}>{selected.priority}</span>
-                      </div>
-                      <div className={ws.heroBody}>
-                        <p className={ws.label}>Outcome</p>
-                        <p className="workspace-hero-outcome max-w-3xl">
-                          {selected.brief.outcome}
-                        </p>
-                      </div>
-                      <dl className={`${ws.heroDetails} sm:grid-cols-3`}>
-                        <div>
-                          <dt className={ws.label}>Due date</dt>
-                          <dd className={`${ws.heroDetailValue} tabular-nums`}>
-                            {selected.dueDate}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className={ws.label}>Impact</dt>
-                          <dd className={ws.heroDetailValue}>
-                            {selected.brief.impact}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className={ws.label}>Next step</dt>
-                          <dd className={ws.heroDetailValue}>
-                            {selected.brief.nextStep}
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </WorkspaceSection>
-                  <WorkspaceSection title="Action Review" question="Critical actions requiring approval">
-                    <div className="workspace-hero-surface">
-                      <div className={ws.heroBody}>
-                        <p className={ws.label}>Review card</p>
-                        <p className={`mt-1 ${ws.cardTitle}`}>{selected.review.title}</p>
-                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                          <div className={ws.fieldSurface}>
-                            <p className={ws.label}>Owner</p>
-                            <p className={`mt-1 ${ws.heroDetailValue}`}>
-                              {selected.review.owner}
-                            </p>
+
+                        <dl className={ws.cardMetaGrid}>
+                          <div className={`${ws.fieldCell} ${ws.cardMetaGridSpan2}`}>
+                            <dt className={ws.fieldLabel}>Blockers</dt>
+                            <dd className={ws.fieldValue}>{selected.review.blockers}</dd>
                           </div>
-                          <div className={ws.fieldSurface}>
-                            <p className={ws.label}>Due date</p>
-                            <p className={`mt-1 ${ws.heroDetailValue} tabular-nums`}>
-                              {selected.review.dueDate}
-                            </p>
-                          </div>
-                          <div className={`${ws.fieldSurface} sm:col-span-2`}>
-                            <p className={ws.label}>Blockers</p>
-                            <p className={`mt-1 ${ws.contextItem}`}>
-                              {selected.review.blockers}
-                            </p>
-                          </div>
-                          <div className={ws.fieldSurface}>
-                            <p className={ws.label}>Impact</p>
-                            <p className={`mt-1 ${ws.contextItem}`}>
-                              {selected.review.impact}
-                            </p>
-                          </div>
-                          <div className={ws.fieldSurface}>
-                            <p className={ws.label}>Current progress</p>
-                            <p className={`mt-1 ${ws.heroDetailValue} tabular-nums`}>
-                              {selected.review.progress}% complete
-                            </p>
-                          </div>
-                        </div>
-                        {selected.review.approvalRequired ? (
-                          <p className="mt-3 text-caption text-brand-teal/90">
-                            Approval required to continue execution without delay.
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
-                  </WorkspaceSection>
-                  <WorkspaceSection title="Timeline" question="Chronological activity">
-                    <div className="space-y-2">
-                      {timelineRows.map((row, index) => {
-                        const Icon = TIMELINE_ICONS[index % TIMELINE_ICONS.length]
-                        return (
-                          <div
-                            key={row.id}
-                            className={`${ws.cardLift} ${ws.interactive} flex items-start gap-2.5`}
-                          >
-                            <div className="flex flex-col items-center pt-0.5">
-                              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-white/75 text-brand-teal">
-                                <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-                              </span>
-                              {index < timelineRows.length - 1 ? (
-                                <span className="mt-1 h-5 w-px bg-neutral-border/55" aria-hidden />
-                              ) : null}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-micro tabular-nums text-neutral-muted">
-                                  {row.time}
+                          <div className={ws.fieldCell}>
+                            <dt className={ws.fieldLabel}>Progress</dt>
+                            <dd>
+                              <div className={ws.queueCardProgress}>
+                                <div className={ws.progressTrack}>
+                                  <div
+                                    className={ws.progressFill}
+                                    style={{ width: `${selected.review.progress}%` }}
+                                  />
+                                </div>
+                                <span className={ws.queueCardProgressLabel}>
+                                  {selected.review.progress}%
                                 </span>
-                                <span className={wsBadge.info}>{row.status}</span>
                               </div>
-                              <p className="mt-1 text-small text-neutral-text">{row.event}</p>
-                            </div>
+                            </dd>
                           </div>
-                        )
-                      })}
-                    </div>
-                  </WorkspaceSection>
-                  <WorkspaceSection title="Dependencies" question="Blocked actions and related work">
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {selected.dependencies.map((dep) => (
-                        <article key={dep.id} className={ws.cardLift}>
-                          <p className={ws.label}>{dep.label}</p>
-                          <p className="mt-1 text-caption text-neutral-text/85">{dep.detail}</p>
-                        </article>
-                      ))}
-                    </div>
-                  </WorkspaceSection>
-                  <WorkspaceSection title="Approvals" question="Decision required to proceed">
-                    <div className={ws.cardLift}>
-                      <p className="text-small text-neutral-text">
-                        Choose approval action in footer to continue execution workflow.
+                          <div className={ws.fieldCell}>
+                            <dt className={ws.fieldLabel}>Due date</dt>
+                            <dd className={`${ws.fieldValue} tabular-nums`}>{selected.review.dueDate}</dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </WorkspaceSection>
+
+                    <WorkspaceSection title="Timeline" variant="tier" scrollBody>
+                      {timelineHighlights.length > 0 ? (
+                        <TimelineHighlightsSection highlights={timelineHighlights} />
+                      ) : (
+                        <p className={`${ws.meta} px-1`}>
+                          Updates will appear here as execution progresses.
+                        </p>
+                      )}
+                    </WorkspaceSection>
+
+                    <WorkspaceSection
+                      title="Dependencies"
+                      variant="tier"
+                      count={dependencyCount}
+                    >
+                      {selected.dependencies.length > 0 ? (
+                        <div className="space-y-3">
+                          {selected.dependencies.map((dep) => (
+                            <div key={dep.id} className={ws.knowledgeRow}>
+                              <p className={ws.fieldLabel}>{dep.label}</p>
+                              <p className={ws.fieldValue}>{dep.detail}</p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className={`${ws.meta} px-1`}>No dependencies linked to this action.</p>
+                      )}
+                    </WorkspaceSection>
+                  </div>
+                </div>
+
+                <div className="workspace-sticky-footer">
+                  <div className={ws.footerBar}>
+                    {selected.review.approvalRequired ? (
+                      <p className={ws.meta}>
+                        <span className={wsBadge.warning}>Approval required</span>
+                        {' — '}
+                        Record approval to unblock execution.
                       </p>
+                    ) : (
+                      <p className={ws.eyebrow}>What happens next?</p>
+                    )}
+                    <div className={ws.footerActions}>
+                      <Button variant="primary" className={ws.footerPrimary}>
+                        <Check className="h-3.5 w-3.5" strokeWidth={1.75} /> Approve
+                      </Button>
+                      <Button variant="ghost" className={ws.footerSecondary}>
+                        <UserRound className="h-3.5 w-3.5" strokeWidth={1.75} /> Delegate
+                      </Button>
+                      <Button variant="ghost" className={ws.footerSecondary}>
+                        <X className="h-3.5 w-3.5" strokeWidth={1.75} /> Reject
+                      </Button>
+                      <Button variant="ghost" className={ws.footerSecondary}>
+                        <Clock3 className="h-3.5 w-3.5" strokeWidth={1.75} /> Request Update
+                      </Button>
                     </div>
-                  </WorkspaceSection>
+                  </div>
                 </div>
               </div>
-              <div className="workspace-sticky-footer">
-                <div className={ws.footerActions}>
-                  <Button variant="primary" className={ws.footerPrimary}>
-                    <Check className="h-3.5 w-3.5" strokeWidth={1.75} /> Approve
-                  </Button>
-                  <Button variant="ghost" className={ws.footerSecondary}>
-                    <UserRound className="h-3.5 w-3.5" strokeWidth={1.75} /> Delegate
-                  </Button>
-                  <Button variant="ghost" className={ws.footerSecondary}>
-                    <X className="h-3.5 w-3.5" strokeWidth={1.75} /> Reject
-                  </Button>
-                  <Button variant="ghost" className={ws.footerSecondary}>
-                    <Clock3 className="h-3.5 w-3.5" strokeWidth={1.75} /> Request Update
-                  </Button>
-                </div>
-              </div>
-            </>
+            </div>
           ) : (
-            <div className="flex min-h-0 flex-1 flex-col px-4 py-5">
-              <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className={`mx-auto flex w-full max-w-lg flex-1 flex-col justify-center ${ws.panelBdEmpty}`}>
                 <WorkspaceEmptyState
-                  icon={<CheckSquare className="h-5 w-5" strokeWidth={1.75} aria-hidden />}
+                  icon={<LayoutTemplate className="h-5 w-5" strokeWidth={1.75} aria-hidden />}
                   title="Select an action item"
                   description="Review critical actions, approve commitments, track execution, and monitor dependencies from one workspace."
                   className="border-0 bg-transparent p-0"
                 />
+
+                <ul className="mt-4 space-y-2">
+                  {emptyStateItems.map(({ icon: Icon, title, description }) => (
+                    <li key={title} className={`${ws.emptyHint} ${ws.cardTimeline}`}>
+                      <div className="icon-well icon-well-neutral icon-well-lg">
+                        <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                      </div>
+                      <div className={ws.cardTimelineBody}>
+                        <p className={ws.cardTitle}>{title}</p>
+                        <p className={ws.meta}>{description}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           )}
         </main>
 
-        <aside className="panel-surface hidden min-h-0 flex-col lg:flex">
+        <aside
+          className="panel-surface hidden h-full min-h-0 min-w-0 w-full flex-col lg:flex"
+          aria-label="Knowledge panel"
+        >
           <div className={ws.panelHd}>
-            <h2 className={ws.panelTitle}>Action Context</h2>
+            <h2 className={ws.panelTitle}>Knowledge</h2>
             <p className={ws.meta}>
-              {selected ? 'Related execution context' : 'Select an action to view context'}
+              {selected ? 'Related context & linked assets' : 'Select an action to view related context'}
             </p>
           </div>
           <div className={ws.panelBd}>
             {!selected ? (
               <WorkspaceEmptyState
-                icon={<Link2 className="h-5 w-5" strokeWidth={1.75} aria-hidden />}
-                title="No action selected"
-                description="Related meetings, decisions, projects, owners, documents, dependencies, and risks appear here."
+                icon={<BookOpen className="h-5 w-5" strokeWidth={1.75} aria-hidden />}
+                title="Knowledge context appears here"
+                description="After selecting an action, this panel shows related meetings, decisions, projects, documents, owners, and risks."
               />
             ) : (
-              <div className={ws.contextStack}>
-                {selected.context.linkedDecisions.length > 0 ? (
-                  <div className="workspace-knowledge-group">
-                    <WorkspaceContextGroupTitle icon={GitBranch} label="Decisions & meetings" />
-                    <div className={ws.contextGroupBody}>
-                      {selected.context.linkedDecisions.map((link) => (
-                        <p key={link.id} className={ws.contextItemTitle}>
-                          {link.title}
-                        </p>
-                      ))}
-                      {selected.context.linkedMeetings.map((link) => (
-                        <p key={link.id} className={ws.contextItem}>
-                          {link.title}
-                        </p>
-                      ))}
+              <div key={selected.id} className={`${ws.contextEnter} ${ws.contextKnowledgeFlow}`}>
+                <KnowledgeMiniCard icon={BookOpen} title="Overview">
+                  <div className={ws.knowledgeMetrics}>
+                    <div className={ws.knowledgeMetric}>
+                      <p className={ws.fieldLabel}>Dependencies</p>
+                      <p className={`${ws.fieldValue} tabular-nums`}>{dependencyCount}</p>
+                    </div>
+                    <div className={ws.knowledgeMetric}>
+                      <p className={ws.fieldLabel}>Linked</p>
+                      <p className={`${ws.fieldValue} tabular-nums`}>{linkedCount}</p>
                     </div>
                   </div>
+                </KnowledgeMiniCard>
+
+                <KnowledgeMiniCard
+                  icon={GitBranch}
+                  title="Decisions"
+                  count={selected.context.linkedDecisions.length}
+                >
+                  {selected.context.linkedDecisions.length === 0 ? (
+                    <p className={ws.knowledgeMeta}>None linked</p>
+                  ) : (
+                    selected.context.linkedDecisions.map((link) => (
+                      <div key={link.id} className={ws.knowledgeRow}>
+                        <p className={`${ws.knowledgeValue} line-clamp-2`}>{link.title}</p>
+                        <p className={ws.knowledgeMeta}>{link.type}</p>
+                      </div>
+                    ))
+                  )}
+                </KnowledgeMiniCard>
+
+                <KnowledgeMiniCard
+                  icon={Link2}
+                  title="Related meetings"
+                  count={selected.context.linkedMeetings.length}
+                >
+                  {selected.context.linkedMeetings.length === 0 ? (
+                    <p className={ws.knowledgeMeta}>None linked</p>
+                  ) : (
+                    selected.context.linkedMeetings.map((meeting) => (
+                      <button
+                        key={meeting.id}
+                        type="button"
+                        className={`${ws.knowledgeMeetingBtn} ${ws.interactive} group`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className={`truncate ${ws.knowledgeValue}`}>{meeting.title}</p>
+                          <p className={ws.knowledgeMeta}>{meeting.type}</p>
+                        </div>
+                        <ChevronRight
+                          className="h-3.5 w-3.5 shrink-0 text-neutral-muted transition-transform duration-200 group-hover:translate-x-0.5"
+                          strokeWidth={1.75}
+                          aria-hidden
+                        />
+                      </button>
+                    ))
+                  )}
+                </KnowledgeMiniCard>
+
+                <KnowledgeMiniCard
+                  icon={Users}
+                  title="People"
+                  count={selected.context.owners.length}
+                >
+                  {selected.context.owners.length === 0 ? (
+                    <p className={ws.knowledgeMeta}>None listed</p>
+                  ) : (
+                    selected.context.owners.map((owner) => (
+                      <div key={owner.name} className={ws.knowledgePersonRow}>
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-caption font-medium text-neutral-muted">
+                          {initials(owner.name)}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <span className={`block truncate ${ws.knowledgeValue}`}>{owner.name}</span>
+                          {owner.role ? (
+                            <span className={`block truncate ${ws.knowledgeMeta}`}>{owner.role}</span>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </KnowledgeMiniCard>
+
+                <KnowledgeMiniCard
+                  icon={LayoutTemplate}
+                  title="Assets"
+                  count={
+                    selected.context.linkedProjects.length + selected.context.linkedDocuments.length
+                  }
+                >
+                  {selected.context.linkedProjects.length === 0 &&
+                  selected.context.linkedDocuments.length === 0 ? (
+                    <p className={ws.knowledgeMeta}>None linked</p>
+                  ) : (
+                    <>
+                      {selected.context.linkedProjects.length > 0 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          {selected.context.linkedProjects.map((project) => (
+                            <span key={project.id} className={ws.statChip}>
+                              {project.title}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+                      {selected.context.linkedDocuments.length > 0
+                        ? selected.context.linkedDocuments.map((doc) => (
+                            <div key={doc.id} className={ws.knowledgeDocCard}>
+                              <div className={ws.iconWell}>
+                                <FileText className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className={`truncate ${ws.knowledgeValue}`}>{doc.title}</p>
+                                <p className={ws.knowledgeMeta}>{doc.type}</p>
+                              </div>
+                            </div>
+                          ))
+                        : null}
+                    </>
+                  )}
+                </KnowledgeMiniCard>
+
+                {selected.context.risks.length > 0 ? (
+                  <KnowledgeMiniCard
+                    icon={ShieldAlert}
+                    title="Risks"
+                    count={selected.context.risks.length}
+                  >
+                    {selected.context.risks.map((risk) => (
+                      <p key={risk} className={ws.knowledgeValue}>
+                        {risk}
+                      </p>
+                    ))}
+                  </KnowledgeMiniCard>
                 ) : null}
-                {selected.context.linkedProjects.length > 0 ? (
-                  <div className="workspace-knowledge-group">
-                    <WorkspaceContextGroupTitle icon={FolderKanban} label="Project & owners" />
-                    <div className={ws.contextGroupBody}>
-                      {selected.context.linkedProjects.map((link) => (
-                        <p key={link.id} className={ws.contextItemTitle}>
-                          {link.title}
-                        </p>
-                      ))}
-                      {selected.context.owners.map((owner) => (
-                        <p key={owner.name} className={ws.contextItem}>
-                          {owner.name}
-                          {owner.role ? ` · ${owner.role}` : ''}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-                {selected.context.dependencies.length > 0 || selected.dependencies.length > 0 ? (
-                  <div className="workspace-knowledge-group">
-                    <WorkspaceContextGroupTitle icon={ArrowRight} label="Dependencies" />
-                    <div className={ws.contextGroupBody}>
-                      {[...selected.context.dependencies, ...selected.dependencies].map((dep) => (
-                        <p key={dep.id} className={ws.contextItem}>
-                          {dep.detail}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-                {selected.context.linkedDocuments.length > 0 || selected.context.risks.length > 0 ? (
-                  <div className="workspace-knowledge-group">
-                    <WorkspaceContextGroupTitle icon={FileText} label="Documents & risks" />
-                    <div className={ws.contextGroupBody}>
-                      {selected.context.linkedDocuments.map((doc) => (
-                        <p key={doc.id} className={ws.contextItem}>
-                          {doc.title}
-                        </p>
-                      ))}
-                      {selected.context.risks.map((risk) => (
-                        <p key={risk} className={ws.contextItem}>
-                          {risk}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-                <div className="workspace-knowledge-group">
-                  <WorkspaceContextGroupTitle icon={Bot} label="AI context" />
-                  <p className={ws.contextItem}>
-                    Summary, ownership, dependencies, and approvals are preloaded for review.
-                  </p>
-                </div>
               </div>
             )}
           </div>
