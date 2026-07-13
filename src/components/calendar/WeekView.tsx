@@ -1,121 +1,86 @@
 import type { CalendarEvent } from '../../types/calendar'
-import { getWeekdayLabels, getEventsForDate, isWeekend } from '../../utils/calendar'
-import { WEEK_GRID_HEIGHT_PX, WEEK_TIMELINE_WIDTH_PX, layoutWeekDayEvents } from '../../utils/calendarWeekLayout'
+import { getEventsForDate } from '../../utils/calendar'
 import { TODAY } from '../../data/constants'
-import { Card } from '../ui/Card'
-import { WeekTimelineGutter, WeekHourGrid } from './WeekTimelineGutter'
-import { WeekMeetingCard } from './WeekMeetingCard'
-import { WeekOverflowPill } from './WeekOverflowPill'
+import { getCategoryTheme } from './categoryTheme'
 
 interface WeekViewProps {
   weekDates: string[]
   events: CalendarEvent[]
-  selectedDate: string
   selectedEventId: string | null
-  onSelectDate: (date: string) => void
   onSelectEvent: (event: CalendarEvent) => void
 }
 
-export function WeekView({
-  weekDates,
-  events,
-  selectedDate,
-  selectedEventId,
-  onSelectDate,
-  onSelectEvent,
-}: WeekViewProps) {
-  const weekdays = getWeekdayLabels()
-
+export function WeekView({ weekDates, events, selectedEventId, onSelectEvent }: WeekViewProps) {
   return (
-    <Card variant="container" className="flex h-full min-h-0 flex-col p-0">
-      {/* Day headers */}
-      <div
-        className="grid shrink-0 border-b border-neutral-border/50 bg-neutral-bg/30"
-        style={{ gridTemplateColumns: `${WEEK_TIMELINE_WIDTH_PX}px repeat(7, minmax(0, 1fr))` }}
-      >
-        <div />
-        {weekDates.map((date, i) => {
-          const isSelected = date === selectedDate
-          const isToday = date === TODAY
-          const d = new Date(`${date}T00:00:00`)
-          const count = getEventsForDate(events, date).filter(
-            (e) => e.blockType !== 'focus' && e.blockType !== 'break' && e.blockType !== 'lunch',
-          ).length
+    <section className="h-full card-surface reveal-fade flex flex-col overflow-hidden p-0 border border-[var(--border-subtle)]">
+      <header className="shrink-0 border-b border-[var(--border-subtle)] bg-neutral-bg/50 px-6 py-4">
+        <h2 className="text-body font-bold text-neutral-text">Week Overview</h2>
+      </header>
 
+      <div className="flex-1 overflow-y-auto px-6 py-2">
+        {weekDates.map(date => {
+          const dayEvents = getEventsForDate(events, date)
+          const isToday = date === TODAY
+          const dayLabel = new Date(date).toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric' })
+          
           return (
-            <button
-              key={date}
-              type="button"
-              onClick={() => onSelectDate(date)}
-              className={`focus-ring min-w-0 border-r border-neutral-border/40 px-1.5 py-1 text-left ease-premium last:border-r-0 hover:bg-neutral-bg/50 ${
-                isSelected ? 'bg-brand-tealLight/45' : isToday ? 'bg-brand-tealLight/20' : ''
-              }`}
-            >
-              <div className="flex items-baseline justify-between gap-1">
-                <p className="truncate text-[11px] leading-none">
-                  <span className="font-medium uppercase tracking-wide text-neutral-muted">
-                    {weekdays[i].slice(0, 3)}
+            <div key={date} className="mt-8 first:mt-4 reveal-scale">
+              <div className="sticky top-0 z-10 mb-3 bg-surface/95 backdrop-blur-md py-2 border-b border-[var(--border-subtle)]/50">
+                <h3 className="flex items-baseline gap-2">
+                  <span className={`text-body-lg font-bold ${isToday ? 'text-brand-teal' : 'text-neutral-text'}`}>
+                    {isToday ? 'Today' : dayLabel.split(',')[0]}
                   </span>
-                  <span
-                    className={`ml-1 font-semibold tabular-nums ${
-                      isToday ? 'text-brand-teal' : 'text-neutral-text'
-                    }`}
-                  >
-                    {d.getDate()}
-                  </span>
-                </p>
-                {count > 0 && (
-                  <span className="shrink-0 text-[9px] tabular-nums text-neutral-muted/80">
-                    {count}
-                  </span>
-                )}
+                  {!isToday && (
+                    <span className="text-small font-medium text-neutral-muted">
+                      {dayLabel.split(',')[1]}
+                    </span>
+                  )}
+                </h3>
               </div>
-            </button>
+              
+              {dayEvents.length === 0 ? (
+                <div className="py-6 text-body font-medium text-neutral-muted">
+                  No scheduled events for this day.
+                </div>
+              ) : (
+                <div className="flex flex-col">
+                  {dayEvents.map(event => {
+                    const theme = getCategoryTheme(event.category)
+                    const selected = selectedEventId === event.id
+                    return (
+                      <button
+                        key={event.id}
+                        type="button"
+                        onClick={() => onSelectEvent(event)}
+                        className={`group focus-ring flex w-full items-center gap-5 rounded-lg px-2 py-3 text-left transition-colors hover:bg-[#F3F3EA] ${selected ? 'bg-[#F3F3EA] ring-1 ring-inset ring-brand-teal/30' : ''}`}
+                      >
+                        <div className="w-20 shrink-0 font-mono text-[11.5px] font-semibold tracking-wider text-neutral-muted group-hover:text-neutral-text transition-colors">
+                          {event.time}
+                        </div>
+                        
+                        <div className={`shrink-0 w-1 h-9 rounded-full ${theme.dot}`} />
+                        
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <h4 className="text-body font-bold text-neutral-text truncate">
+                            {event.title}
+                          </h4>
+                          <p className="text-small font-medium text-neutral-muted truncate mt-0.5">
+                            {event.host} · {event.attendees.length > 0 ? `${event.attendees.length} attendees` : 'Personal'}
+                          </p>
+                        </div>
+
+                        <div className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${theme.wash} ${theme.text}`}>
+                          {theme.label || event.category}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           )
         })}
       </div>
-
-      {/* Time grid — vertical scroll only; columns fill available width */}
-      <div className="flex min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-        <WeekTimelineGutter highlightCurrentHour={weekDates.includes(TODAY)} />
-        <div
-          className="grid min-w-0 flex-1"
-          style={{
-            gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-            height: WEEK_GRID_HEIGHT_PX,
-          }}
-        >
-          {weekDates.map((date) => {
-            const dayEvents = getEventsForDate(events, date)
-            const { positioned, overflow } = layoutWeekDayEvents(dayEvents)
-            const weekend = isWeekend(date)
-            const isToday = date === TODAY
-
-            return (
-              <div
-                key={date}
-                className={`relative min-w-0 border-r border-neutral-border/40 last:border-r-0 ${
-                  weekend ? 'bg-neutral-bg/35' : 'bg-white'
-                } ${isToday ? 'bg-brand-tealLight/8' : ''}`}
-                style={{ height: WEEK_GRID_HEIGHT_PX }}
-              >
-                <WeekHourGrid date={date} />
-                {positioned.map((layout) => (
-                  <WeekMeetingCard
-                    key={layout.event.id}
-                    layout={layout}
-                    isSelected={selectedEventId === layout.event.id}
-                    onSelect={onSelectEvent}
-                  />
-                ))}
-                {overflow.map((badge) => (
-                  <WeekOverflowPill key={badge.id} badge={badge} />
-                ))}
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </Card>
+    </section>
   )
 }

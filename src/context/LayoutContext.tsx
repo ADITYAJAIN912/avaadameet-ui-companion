@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
+
+export type TextSize = 'default' | 'large' | 'xlarge'
 
 interface LayoutContextValue {
   sidebarCollapsed: boolean
@@ -7,6 +9,8 @@ interface LayoutContextValue {
   companionOpen: boolean
   setCompanionOpen: (open: boolean) => void
   toggleCompanion: () => void
+  textSize: TextSize
+  setTextSize: (size: TextSize) => void
 }
 
 const LayoutContext = createContext<LayoutContextValue | null>(null)
@@ -14,6 +18,20 @@ const LayoutContext = createContext<LayoutContextValue | null>(null)
 export function LayoutProvider({ children }: { children: ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [companionOpen, setCompanionOpen] = useState(false)
+  const [textSize, setTextSizeState] = useState<TextSize>(() => {
+    const saved = localStorage.getItem('avaada-text-size')
+    return (saved === 'large' || saved === 'xlarge') ? saved : 'default'
+  })
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (textSize === 'default') {
+      root.removeAttribute('data-text-size')
+    } else {
+      root.setAttribute('data-text-size', textSize)
+    }
+    localStorage.setItem('avaada-text-size', textSize)
+  }, [textSize])
 
   const toggleSidebar = useCallback(() => {
     setSidebarCollapsed((prev) => !prev)
@@ -21,6 +39,10 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
 
   const toggleCompanion = useCallback(() => {
     setCompanionOpen((prev) => !prev)
+  }, [])
+
+  const setTextSize = useCallback((size: TextSize) => {
+    setTextSizeState(size)
   }, [])
 
   return (
@@ -32,6 +54,8 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         companionOpen,
         setCompanionOpen,
         toggleCompanion,
+        textSize,
+        setTextSize,
       }}
     >
       {children}

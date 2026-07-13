@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option O — Corporate Bento Green</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Fragment+Mono&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #EFEEE7;          /* warm off-white canvas */
+    --card: #FAFAF5;        /* tile surface */
+    --ink: #1C2620;
+    --muted: #67736B;
+    --green: #205C42;       /* corporate forest green */
+    --green-deep: #174834;
+    --green-tile: #1E5540;
+    --green-soft: #DFE8DF;
+    --line: #DDDCD0;
+    --amber: #96690F;
+    --red: #A6392F;
+    --sage: #8FA893;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Hanken Grotesk',sans-serif; background: var(--bg); color: var(--ink); }
+  .mono { font-family:'Fragment Mono',monospace; }
+
+  @keyframes pop { from { opacity:0; transform: translateY(16px) scale(0.985);} to {opacity:1; transform:none;} }
+  .p { animation: pop .6s cubic-bezier(0.16,1,0.3,1) both; }
+  .p1{animation-delay:.05s}.p2{animation-delay:.1s}.p3{animation-delay:.15s}.p4{animation-delay:.2s}.p5{animation-delay:.25s}.p6{animation-delay:.3s}.p7{animation-delay:.35s}
+
+  header { max-width: 1120px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; padding: 22px 28px 6px; }
+  .logo { display:flex; align-items:center; gap: 10px; }
+  .logo .mk { width: 32px; height: 32px; border-radius: 9px; background: var(--green); color: #EFEEE7; display:flex; align-items:center; justify-content:center; font-weight: 800; font-size: 15px; }
+  .logo b { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+  nav { display:flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+  nav a { text-decoration:none; color: var(--muted); font-size: 13.5px; font-weight: 600; padding: 8px 18px; border-radius: 999px; transition: all .2s; }
+  nav a:hover { color: var(--ink); }
+  nav a.on { background: var(--green); color: #EFEEE7; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-soft); border: 1px solid #C8D4C8; color: var(--green); font-size: 12.5px; font-weight: 800; display:flex; align-items:center; justify-content:center; }
+
+  main { max-width: 1120px; margin: 0 auto; padding: 26px 28px 80px; }
+  .greet { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 20px; }
+  .kick { font-family:'Fragment Mono',monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; margin-top: 6px; }
+  .btn { font-family:inherit; font-weight: 700; font-size: 13.5px; border-radius: 12px; padding: 11px 20px; cursor:pointer; transition: all .2s; }
+  .btn.solid { background: var(--green); color: #EFEEE7; border: 1px solid var(--green); }
+  .btn.solid:hover { background: #184A34; transform: translateY(-1px); box-shadow: 0 10px 22px -10px rgba(32,92,66,0.55); }
+  .btn.out { background: var(--card); border: 1px solid var(--line); color: var(--ink); }
+  .btn.out:hover { border-color: var(--green); color: var(--green); }
+
+  /* bento grid */
+  .bento { display:grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(84px, auto); gap: 14px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; transition: all .25s cubic-bezier(0.16,1,0.3,1); position: relative; overflow:hidden; }
+  .tile:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -14px rgba(28,38,32,0.18); border-color: #C9CDBE; }
+
+  /* hero tile — dark green */
+  .hero { grid-column: span 8; grid-row: span 2; background: var(--green-tile); border-color: var(--green-tile); color: #EDF3ED; display:flex; flex-direction:column; justify-content:space-between; }
+  .hero::after { content:''; position:absolute; right: -70px; top: -70px; width: 260px; height: 260px; border-radius: 50%; border: 36px solid rgba(239,238,231,0.06); }
+  .hero .lv { display:inline-flex; align-items:center; gap: 8px; font-family:'Fragment Mono',monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #A7C6AF; }
+  .hero .lv i { width: 7px; height: 7px; border-radius: 50%; background: #8FD1A5; animation: bl 1.7s ease infinite; }
+  @keyframes bl { 50% { opacity: 0.3; } }
+  .hero h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 10px 0 4px; }
+  .hero .m { font-size: 13.5px; color: #B9CFBE; font-weight: 500; }
+  .hero .foot { display:flex; align-items:center; justify-content:space-between; margin-top: 20px; position: relative; z-index:1; }
+  .hero .faces { display:flex; }
+  .hero .fc { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--green-tile); background: #34755A; color:#EDF3ED; font-size: 10px; font-weight: 700; display:flex; align-items:center; justify-content:center; margin-left: -8px; }
+  .hero .fc:first-child { margin-left: 0; }
+  .hero .btn { background: #EFEEE7; color: var(--green); border: none; }
+  .hero .btn:hover { transform: scale(1.05); }
+
+  /* stat tiles */
+  .stat { grid-column: span 4; display:flex; flex-direction:column; justify-content:space-between; }
+  .stat .l { font-size: 12.5px; font-weight: 600; color: var(--muted); display:flex; justify-content:space-between; align-items:center; }
+  .stat .ic { width: 28px; height: 28px; border-radius: 8px; background: var(--green-soft); color: var(--green); font-size: 13px; display:flex; align-items:center; justify-content:center; }
+  .stat .v { font-size: 30px; font-weight: 800; letter-spacing: -0.04em; margin-top: 12px; }
+  .stat .f { font-size: 12px; font-weight: 700; margin-top: 2px; }
+  .stat .f.red{color:var(--red);} .stat .f.green{color:var(--green);} .stat .f.dim{color:var(--muted);}
+
+  /* schedule tile */
+  .sched { grid-column: span 7; grid-row: span 3; padding: 0; display:flex; flex-direction:column; }
+  .thd { display:flex; justify-content:space-between; align-items:center; padding: 18px 22px 12px; }
+  .thd h3 { font-size: 15px; font-weight: 800; letter-spacing:-0.01em; }
+  .thd a { font-size: 12.5px; color: var(--green); font-weight: 700; text-decoration:none; }
+  .thd a:hover { text-decoration:underline; }
+  .row { display:flex; align-items:center; gap: 15px; padding: 13px 22px; border-top: 1px solid #ECEBE0; transition: background .15s; cursor:pointer; }
+  .row:hover { background: #F3F3EA; }
+  .tm { font-family:'Fragment Mono',monospace; font-size: 11.5px; color: var(--muted); min-width: 84px; }
+  .row .b { flex:1; }
+  .row .n { font-weight: 700; font-size: 14px; }
+  .row .s { font-size: 12px; color: var(--muted); margin-top: 1px; font-weight: 500; }
+  .chip { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 4px 11px; }
+  .chip.green { background: var(--green-soft); color: var(--green); }
+  .chip.amber { background: #F0E7CE; color: var(--amber); }
+  .chip.red { background: #F2E1DE; color: var(--red); }
+
+  /* actions tile */
+  .acts { grid-column: span 5; grid-row: span 2; padding: 0; }
+  .task { display:flex; align-items:center; gap: 12px; padding: 12px 22px; border-top: 1px solid #ECEBE0; }
+  .cb { width: 18px; height: 18px; border: 1.5px solid #C2C1B2; border-radius: 6px; cursor:pointer; transition: all .18s; flex-shrink:0; }
+  .cb:hover { border-color: var(--green); background: var(--green-soft); }
+  .task .t { font-size: 13.5px; font-weight: 600; flex: 1; }
+
+  /* AI tile — soft green */
+  .ai { grid-column: span 5; background: var(--green-soft); border-color: #CBD8CB; }
+  .ai .h { display:flex; align-items:center; gap: 10px; margin-bottom: 10px; }
+  .ai .orb { width: 30px; height: 30px; border-radius: 10px; background: var(--green); color: #EFEEE7; display:flex; align-items:center; justify-content:center; font-size: 14px; }
+  .ai b.t { font-size: 14px; font-weight: 800; }
+  .ai p { font-size: 13px; line-height: 1.6; color: #37473C; font-weight: 500; }
+  .ai p b { color: var(--green); }
+  .ai .btn { margin-top: 13px; font-size: 12.5px; padding: 8px 16px; background: var(--card); }
+
+  @media(max-width: 900px){
+    .bento { grid-template-columns: 1fr; }
+    .hero,.stat,.sched,.acts,.ai { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+  <header class="p">
+    <div class="logo"><span class="mk">A</span><b>AvaadaMeet</b></div>
+    <nav><a class="on" href="#">Today</a><a href="#">Calendar</a><a href="#">Meetings</a><a href="#">Actions</a></nav>
+    <span class="avatar">GM</span>
+  </header>
+
+  <main>
+    <div class="greet p p1">
+      <div>
+        <span class="kick">FRI · 29 JUNE 2026</span>
+        <h1>Good morning, Gyanpriya</h1>
+      </div>
+      <button class="btn out">+ New meeting</button>
+    </div>
+
+    <div class="bento">
+      <div class="tile hero p p2">
+        <div>
+          <span class="lv"><i></i>Up next · in 12 min</span>
+          <h2>Product Sync — Q3 Roadmap</h2>
+          <p class="m">10:30 – 11:15 · Google Meet · Room 4B · Prep notes ready</p>
+        </div>
+        <div class="foot">
+          <div class="faces"><span class="fc">RS</span><span class="fc">AK</span><span class="fc">PT</span><span class="fc">+4</span></div>
+          <button class="btn">Join meeting →</button>
+        </div>
+      </div>
+
+      <div class="tile stat p p3"><div class="l">Actions due <span class="ic">☑</span></div><div><div class="v">3</div><div class="f red">1 overdue — board deck</div></div></div>
+      <div class="tile stat p p4"><div class="l">Focus left <span class="ic">◔</span></div><div><div class="v">1h 20m</div><div class="f green">+25m vs. usual</div></div></div>
+
+      <div class="tile sched p p5">
+        <div class="thd"><h3>Today's schedule</h3><a href="#">Open calendar</a></div>
+        <div class="row"><span class="tm">10:30–11:15</span><div class="b"><div class="n">Product Sync — Q3 Roadmap</div><div class="s">Google Meet · 7 people</div></div><span class="chip green">Prepped</span></div>
+        <div class="row"><span class="tm">12:00–12:30</span><div class="b"><div class="n">Leadership standup</div><div class="s">Room 2A · 4 people</div></div><span class="chip amber">Prep needed</span></div>
+        <div class="row"><span class="tm">14:30–15:30</span><div class="b"><div class="n">Design review — Solar dashboard</div><div class="s">Google Meet · 6 people</div></div><span class="chip amber">Prep needed</span></div>
+        <div class="row"><span class="tm">16:00–16:25</span><div class="b"><div class="n">1:1 with Rahul</div><div class="s">Walk & talk</div></div><span class="chip green">Ready</span></div>
+      </div>
+
+      <div class="tile acts p p6">
+        <div class="thd"><h3>Actions due</h3><a href="#">See all</a></div>
+        <div class="task"><span class="cb"></span><span class="t">Review board deck v3</span><span class="chip red">2d late</span></div>
+        <div class="task"><span class="cb"></span><span class="t">Send solar RFP shortlist</span><span class="chip amber">Today</span></div>
+        <div class="task"><span class="cb"></span><span class="t">Approve Q3 hiring plan</span><span class="chip amber">Today</span></div>
+      </div>
+
+      <div class="tile ai p p7">
+        <div class="h"><span class="orb">✦</span><b class="t">AI Companion</b></div>
+        <p>Prep notes for <b>Product Sync</b> are ready. The overdue <b>board deck</b> is today's critical path — clear it before 14:30.</p>
+        <button class="btn out">▸ Play 60-sec brief</button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

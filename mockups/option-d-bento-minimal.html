@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option D — Bento Minimal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #EDEDED;
+    --tile: #FFFFFF;
+    --ink: #1D1D1F;
+    --muted: #86868B;
+    --blue: #0071E3;
+    --orange: #FF6B2C;
+    --green: #30D158;
+    --purple: #BF5AF2;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',-apple-system,sans-serif; background: var(--bg); color: var(--ink); letter-spacing: -0.01em; }
+
+  @keyframes tileIn { from { opacity:0; transform: scale(0.96) translateY(14px); } to { opacity:1; transform: scale(1) translateY(0); } }
+  .t { animation: tileIn 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+  .t1{animation-delay:.05s}.t2{animation-delay:.1s}.t3{animation-delay:.15s}.t4{animation-delay:.2s}.t5{animation-delay:.25s}.t6{animation-delay:.3s}.t7{animation-delay:.35s}
+
+  header { display:flex; align-items:center; justify-content:space-between; max-width: 1160px; margin: 0 auto; padding: 22px 24px 10px; }
+  .logo { font-weight: 800; font-size: 19px; letter-spacing: -0.03em; }
+  nav { display:flex; gap: 2px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; }
+  nav a { text-decoration:none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 8px 18px; border-radius: 9px; transition: all .3s cubic-bezier(0.16,1,0.3,1); }
+  nav a.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+  nav a:hover:not(.active) { color: var(--ink); }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#FF9F0A,#FF375F); color:#fff; display:flex; align-items:center; justify-content:center; font-size: 13px; font-weight: 700; }
+
+  main { max-width: 1160px; margin: 0 auto; padding: 26px 24px 80px; }
+  h1 { font-size: clamp(32px, 4vw, 44px); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 17px; font-weight: 500; margin-bottom: 28px; }
+
+  .bento {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 130px;
+  }
+  @media (max-width: 900px){ .bento { grid-template-columns: repeat(2,1fr); } }
+
+  .tile {
+    background: var(--tile); border-radius: 22px; padding: 22px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    display:flex; flex-direction:column; justify-content: space-between;
+    transition: transform .4s cubic-bezier(0.16,1,0.3,1), box-shadow .4s;
+    position: relative; overflow: hidden; cursor: pointer;
+  }
+  .tile:hover { transform: scale(1.015); box-shadow: 0 12px 32px rgba(0,0,0,0.10); }
+
+  .hero { grid-column: span 2; grid-row: span 2; background: var(--ink); color: #fff; }
+  .live-pill { display:inline-flex; align-items:center; gap: 7px; background: rgba(255,255,255,0.14); border-radius: 999px; padding: 6px 13px; font-size: 12px; font-weight: 700; width: fit-content; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: p 1.6s ease infinite; }
+  @keyframes p { 50% { opacity: .3; } }
+  .hero h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; }
+  .hero .meta { font-family:'Geist Mono',monospace; font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 8px; }
+  .hero-bottom { display:flex; align-items:center; justify-content:space-between; }
+  .avs { display:flex; }
+  .avs span { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid var(--ink); margin-left: -9px; display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight: 700; background:#5E5CE6; color:#fff; }
+  .avs span:first-child{margin-left:0} .avs span:nth-child(2){background:#FF9F0A} .avs span:nth-child(3){background:#30D158} .avs span:nth-child(4){background:#48484A}
+  .join { background: #fff; color: var(--ink); border:none; border-radius: 999px; padding: 12px 26px; font-size: 15px; font-weight: 700; cursor:pointer; transition: transform .3s cubic-bezier(0.34,1.56,0.64,1); }
+  .join:hover { transform: scale(1.05); }
+
+  .stat-num { font-size: 46px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+  .stat-lbl { font-size: 14px; font-weight: 600; color: var(--muted); }
+  .tile.blue { background: var(--blue); color:#fff; } .tile.blue .stat-lbl { color: rgba(255,255,255,0.7); }
+  .tile.orange { background: var(--orange); color:#fff; } .tile.orange .stat-lbl { color: rgba(255,255,255,0.75); }
+
+  .tall { grid-row: span 2; }
+  .wide { grid-column: span 2; }
+  .tile-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .sched { display:flex; flex-direction:column; gap: 0; margin-top: 10px; flex: 1; }
+  .srow { display:flex; align-items:center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .srow:last-child { border: none; }
+  .srow .tm { font-family:'Geist Mono',monospace; font-size: 12.5px; color: var(--muted); width: 44px; }
+  .srow .nm { font-size: 14.5px; font-weight: 600; flex: 1; }
+  .srow .dot2 { width: 8px; height: 8px; border-radius: 3px; background: var(--blue); }
+  .srow:nth-child(2) .dot2{background:var(--purple)} .srow:nth-child(3) .dot2{background:var(--orange)} .srow:nth-child(4) .dot2{background:var(--green)}
+  .srow:hover .nm { color: var(--blue); }
+
+  .tile.purple { background: linear-gradient(160deg,#BF5AF2,#5E5CE6); color:#fff; }
+  .ai-txt { font-size: 15px; font-weight: 600; line-height: 1.45; }
+  .ai-cta { font-size: 13.5px; font-weight: 700; background: rgba(255,255,255,0.2); width: fit-content; border-radius: 999px; padding: 8px 16px; }
+
+  .progress-wrap { margin-top: auto; }
+  .progress { height: 7px; background: rgba(0,0,0,0.07); border-radius: 99px; overflow:hidden; }
+  .progress i { display:block; height: 100%; width: 64%; background: var(--green); border-radius: 99px; animation: grow 1.2s cubic-bezier(0.16,1,0.3,1) .5s both; }
+  @keyframes grow { from { width: 0; } }
+</style>
+</head>
+<body>
+  <header class="t">
+    <div class="logo"> Avaada</div>
+    <nav>
+      <a class="active" href="#">Today</a><a href="#">Calendar</a><a href="#">Meetings</a><a href="#">Actions</a>
+    </nav>
+    <div class="avatar">GM</div>
+  </header>
+
+  <main>
+    <h1 class="t t1">Good morning, Gyanpriya</h1>
+    <p class="sub t t1">Friday, June 29 · 5 meetings · 3 actions due</p>
+
+    <div class="bento">
+      <div class="tile hero t t2">
+        <span class="live-pill"><span class="live-dot"></span>NEXT · IN 12 MIN</span>
+        <div>
+          <h2>Product Sync —<br/>Q3 Roadmap</h2>
+          <p class="meta">10:30–11:15 · GOOGLE MEET · ROOM 4B</p>
+        </div>
+        <div class="hero-bottom">
+          <div class="avs"><span>RK</span><span>AS</span><span>MP</span><span>+4</span></div>
+          <button class="join">Join</button>
+        </div>
+      </div>
+
+      <div class="tile blue t t3">
+        <span class="tile-kicker" style="color:rgba(255,255,255,0.7)">Actions due</span>
+        <div><div class="stat-num">3</div><div class="stat-lbl">before end of day</div></div>
+      </div>
+
+      <div class="tile t t3">
+        <span class="tile-kicker">Focus time</span>
+        <div><div class="stat-num">1:20</div><div class="stat-lbl">left today</div></div>
+        <div class="progress-wrap"><div class="progress"><i></i></div></div>
+      </div>
+
+      <div class="tile tall t t4">
+        <span class="tile-kicker">Schedule</span>
+        <div class="sched">
+          <div class="srow"><span class="tm">10:30</span><span class="nm">Product Sync</span><span class="dot2"></span></div>
+          <div class="srow"><span class="tm">12:00</span><span class="nm">Leadership standup</span><span class="dot2"></span></div>
+          <div class="srow"><span class="tm">14:30</span><span class="nm">Design review</span><span class="dot2"></span></div>
+          <div class="srow"><span class="tm">16:00</span><span class="nm">1:1 with Rahul</span><span class="dot2"></span></div>
+        </div>
+      </div>
+
+      <div class="tile orange t t5">
+        <span class="tile-kicker" style="color:rgba(255,255,255,0.75)">Overdue</span>
+        <div><div class="stat-num" style="font-size:24px; letter-spacing:-0.02em;">Board deck review</div><div class="stat-lbl">2 days late — fix before 14:30</div></div>
+      </div>
+
+      <div class="tile purple wide t t6">
+        <span class="tile-kicker" style="color:rgba(255,255,255,0.75)">✦ AI Companion</span>
+        <p class="ai-txt">"Prep notes for Product Sync are ready. Want your 60-second morning brief?"</p>
+        <span class="ai-cta">Play brief →</span>
+      </div>
+
+      <div class="tile t t7">
+        <span class="tile-kicker">Meetings this week</span>
+        <div><div class="stat-num">18</div><div class="stat-lbl">2 fewer than last week</div></div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

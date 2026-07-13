@@ -17,9 +17,23 @@
   /* ─── Surfaces ─────────────────────────────────────────────────── */
   .ds-surface-panel {
     border-radius: var(--radius-lg);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--border-default);
     background: var(--surface-default);
-    box-shadow: var(--elevation-1);
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--duration-fast) var(--ease-default), background-color var(--duration-fast) var(--ease-default);
+  }
+
+  .ds-surface-panel-interactive {
+    cursor: pointer;
+  }
+
+  .ds-surface-panel-interactive:hover {
+    border-color: var(--border-strong);
+    background: var(--interactive-hover);
+  }
+
+  .ds-surface-panel-interactive:active {
+    background: var(--interactive-active);
   }
 
   .ds-surface-panel-accent {
@@ -27,37 +41,41 @@
   }
 
   .ds-surface-sunken {
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
   }
 
   .ds-surface-clip {
     min-height: 0;
     flex: 1;
     overflow: hidden;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-sm);
   }
 
   /* ─── Typography roles ─────────────────────────────────────────── */
   .ds-text-page-title {
+    font-family: var(--font-family-display);
     font-size: var(--font-size-display-md);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-tight);
     color: var(--text-primary);
   }
 
   .ds-text-section-title {
+    font-family: var(--font-family-display);
     font-size: var(--font-size-heading-sm);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     line-height: var(--line-height-snug);
     letter-spacing: var(--letter-spacing-tight);
     color: var(--text-primary);
   }
 
   .ds-text-label {
+    font-family: var(--font-family-sans);
     font-size: var(--font-size-micro);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     line-height: var(--line-height-normal);
     letter-spacing: var(--letter-spacing-wider);
     text-transform: uppercase;
@@ -65,7 +83,9 @@
   }
 
   .ds-text-metadata {
+    font-family: var(--font-family-sans);
     font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
     line-height: var(--line-height-normal);
     color: var(--text-tertiary);
   }
@@ -79,9 +99,11 @@
     height: var(--control-height-md);
     padding-inline: var(--space-4);
     border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
     font-size: var(--font-size-body);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-semibold);
     line-height: 1;
+    box-shadow: var(--shadow-xs);
     transition: var(--transition-colors);
     cursor: pointer;
   }
@@ -89,12 +111,22 @@
   .ds-btn:disabled {
     opacity: var(--opacity-disabled);
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .ds-btn:hover:not(:disabled) {
+    background: var(--interactive-hover);
+  }
+
+  .ds-btn:active:not(:disabled) {
+    transform: scale(0.99);
   }
 
   .ds-btn-primary {
     background: var(--color-brand-teal);
     color: var(--text-inverse);
-    border: 1px solid transparent;
+    border-color: transparent;
   }
 
   .ds-btn-primary:hover:not(:disabled) {
@@ -104,24 +136,24 @@
   .ds-btn-secondary {
     background: var(--surface-default);
     color: var(--text-primary);
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--elevation-1);
   }
 
   .ds-btn-secondary:hover:not(:disabled) {
     background: var(--interactive-hover);
-    border-color: var(--border-default);
   }
 
   .ds-btn-ghost {
     background: transparent;
     color: var(--text-secondary);
-    border: 1px solid transparent;
+    border-color: transparent;
+    box-shadow: none;
   }
 
   .ds-btn-ghost:hover:not(:disabled) {
     background: var(--interactive-hover);
     color: var(--text-primary);
+    border-color: var(--border-default);
+    box-shadow: var(--shadow-xs);
   }
 
   .ds-btn-sm {
@@ -134,11 +166,11 @@
   .ds-segment-track {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-0-5);
-    padding: var(--space-0-5);
+    gap: var(--space-1);
+    padding: var(--space-1);
     border-radius: var(--radius-sm);
-    background: color-mix(in srgb, var(--surface-sunken) 70%, transparent);
-    box-shadow: inset 0 0 0 1px var(--border-subtle);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
   }
 
   .ds-segment {
@@ -146,7 +178,7 @@
     align-items: center;
     justify-content: center;
     height: calc(var(--control-height-sm) - var(--space-1));
-    padding-inline: var(--space-2-5);
+    padding-inline: var(--space-3);
     border-radius: calc(var(--radius-sm) - 2px);
     font-size: var(--font-size-caption);
     font-weight: var(--font-weight-medium);
@@ -164,6 +196,8 @@
   .ds-segment[aria-pressed='true'] {
     background: var(--surface-default);
     color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    box-shadow: var(--shadow-xs);
   }
 
   /* ─── Badges (chip hierarchy: status) ──────────────────────────── */
@@ -171,18 +205,21 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 1.5rem;
-    height: 1.5rem;
-    padding-inline: var(--space-2);
+    gap: var(--space-1);
+    min-width: 1.75rem;
+    height: 1.75rem;
+    padding-inline: var(--space-2-5);
     border-radius: var(--radius-full);
-    font-size: var(--font-size-caption);
-    font-weight: var(--font-weight-medium);
+    border: none;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
     line-height: 1;
+    box-shadow: none;
   }
 
   .ds-badge-neutral {
     background: var(--surface-sunken);
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
   }
 
   .ds-badge-success {
@@ -207,7 +244,7 @@
 
   .ds-badge-accent {
     background: var(--surface-accent-strong);
-    color: var(--text-accent);
+    color: var(--text-primary);
   }
 
   /* ─── Rows ─────────────────────────────────────────────────────── */
@@ -312,5 +349,21 @@
 
   .ds-transition-transform {
     transition: var(--transition-transform);
+  }
+
+  /* ─── Scrollbars & Glassmorphism ───────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
   }
 }

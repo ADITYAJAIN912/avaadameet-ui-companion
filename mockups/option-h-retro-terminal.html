@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option H — Retro Terminal Console</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=VT323&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #071209;
+    --panel: #0B1B0E;
+    --phos: #33FF66;
+    --phos-dim: #1E9C41;
+    --phos-faint: rgba(51,255,102,0.14);
+    --amber: #FFB627;
+    --red: #FF4B4B;
+    --line: rgba(51,255,102,0.25);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'JetBrains Mono',monospace; background: var(--bg); color: var(--phos); }
+  /* scanlines + vignette */
+  body::before { content:''; position:fixed; inset:0; z-index:100; pointer-events:none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px); }
+  body::after { content:''; position:fixed; inset:0; z-index:99; pointer-events:none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55)); }
+
+  @keyframes typeIn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes flicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:.6} 94%{opacity:1} }
+  @keyframes blinkc { 50% { opacity: 0; } }
+  @keyframes rise { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+  .ty { animation: typeIn .9s steps(30) both; white-space: nowrap; overflow:hidden; }
+  .rs { animation: rise .5s ease-out both; }
+  .r1{animation-delay:.3s}.r2{animation-delay:.55s}.r3{animation-delay:.8s}.r4{animation-delay:1.05s}.r5{animation-delay:1.3s}
+
+  .crt { animation: flicker 6s infinite; max-width: 1180px; margin: 0 auto; padding: 18px 24px 80px; }
+
+  header { display:flex; align-items:center; justify-content:space-between; border: 1px solid var(--line); padding: 12px 18px; background: var(--panel); box-shadow: 0 0 24px rgba(51,255,102,0.08); }
+  .logo { font-weight: 800; font-size: 17px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(51,255,102,0.7); }
+  .logo::before { content:'█ '; animation: blinkc 1.2s steps(1) infinite; }
+  nav { display: flex; gap: 0; }
+  nav a { text-decoration:none; color: var(--phos-dim); font-size: 13px; letter-spacing: 1.5px; padding: 8px 18px; border-left: 1px solid var(--line); transition: all .15s; text-transform: uppercase; }
+  nav a:last-child { border-right: 1px solid var(--line); }
+  nav a.active { background: var(--phos); color: var(--bg); font-weight: 700; text-shadow:none; }
+  nav a:hover:not(.active) { color: var(--phos); background: var(--phos-faint); }
+  .sysclock { font-size: 13px; letter-spacing: 1px; }
+  .sysclock i { animation: blinkc 1s steps(1) infinite; font-style: normal; }
+
+  .statusbar { display:flex; gap: 0; border: 1px solid var(--line); border-top: none; font-size: 11.5px; letter-spacing: 1px; background: var(--panel); }
+  .statusbar span { padding: 7px 14px; border-right: 1px solid var(--line); color: var(--phos-dim); }
+  .statusbar b { color: var(--phos); font-weight: 500; }
+  .statusbar .warn { color: var(--amber); }
+
+  .prompt { margin: 36px 0 6px; font-size: 13px; color: var(--phos-dim); }
+  .prompt b { color: var(--phos); }
+  h1 { font-family:'VT323',monospace; font-size: clamp(44px, 6.5vw, 78px); font-weight: 400; line-height: 1; letter-spacing: 1px; text-shadow: 0 0 18px rgba(51,255,102,0.55); margin-bottom: 8px; text-transform: uppercase; }
+  .subline { font-size: 13px; color: var(--phos-dim); margin-bottom: 36px; }
+  .subline .cursor { display:inline-block; width: 9px; height: 15px; background: var(--phos); vertical-align: -2px; animation: blinkc 1s steps(1) infinite; }
+
+  .grid { display:grid; grid-template-columns: 1.6fr 1fr; gap: 18px; }
+  @media (max-width:880px){ .grid{grid-template-columns:1fr;} }
+
+  .panel { border: 1px solid var(--line); background: var(--panel); position: relative; }
+  .panel-hd { display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--line); padding: 9px 16px; font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--phos-dim); background: rgba(51,255,102,0.05); }
+  .panel-hd .dots { letter-spacing: 3px; }
+  .panel-bd { padding: 20px; }
+
+  .next-t { font-family:'VT323'; font-size: 38px; line-height: 1.05; text-shadow: 0 0 14px rgba(51,255,102,0.5); margin-bottom: 6px; text-transform: uppercase; }
+  .meta { font-size: 12.5px; color: var(--phos-dim); margin-bottom: 18px; }
+  .countdown { display:flex; gap: 14px; margin-bottom: 20px; }
+  .cd { border: 1px solid var(--line); padding: 10px 14px; text-align: center; min-width: 74px; }
+  .cd .v { font-family:'VT323'; font-size: 34px; line-height: 1; text-shadow: 0 0 12px rgba(51,255,102,0.6); }
+  .cd .k { font-size: 10px; letter-spacing: 2px; color: var(--phos-dim); margin-top: 4px; }
+  .btn-row { display: flex; gap: 12px; }
+  .btn {
+    font-family:'JetBrains Mono'; font-weight: 700; font-size: 13px; letter-spacing: 2px; cursor:pointer; text-transform: uppercase;
+    background: var(--phos); color: var(--bg); border: 1px solid var(--phos); padding: 13px 26px;
+    box-shadow: 0 0 22px rgba(51,255,102,0.35); transition: all .15s;
+  }
+  .btn:hover { box-shadow: 0 0 36px rgba(51,255,102,0.65); transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--phos); box-shadow: none; }
+  .btn.ghost:hover { background: var(--phos-faint); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td { padding: 12px 8px; border-bottom: 1px dashed var(--line); }
+  tr { transition: background .12s; cursor: pointer; }
+  tbody tr:hover { background: var(--phos-faint); }
+  tbody tr:hover td:first-child::before { content:'> '; color: var(--phos); }
+  .tdim { color: var(--phos-dim); }
+  .tr-live td { color: var(--amber); text-shadow: 0 0 10px rgba(255,182,39,0.5); }
+  .tag { font-size: 10px; border: 1px solid var(--line); padding: 3px 8px; letter-spacing: 1.5px; color: var(--phos-dim); }
+  .tr-live .tag { border-color: var(--amber); color: var(--amber); }
+
+  .biggauge { display:flex; align-items:baseline; gap: 12px; padding: 4px 0 12px; }
+  .biggauge .v { font-family:'VT323'; font-size: 64px; line-height: 0.9; text-shadow: 0 0 16px rgba(51,255,102,0.6); }
+  .biggauge .l { font-size: 11.5px; letter-spacing: 1.5px; color: var(--phos-dim); text-transform: uppercase; }
+  .biggauge.amber .v { color: var(--amber); text-shadow: 0 0 16px rgba(255,182,39,0.55); }
+  .bar { height: 10px; border: 1px solid var(--line); margin-bottom: 16px; padding: 1px; }
+  .bar i { display:block; height: 100%; background: repeating-linear-gradient(90deg, var(--phos) 0 6px, transparent 6px 9px); width: 64%; animation: barfill 1.4s steps(12) .8s both; box-shadow: 0 0 12px rgba(51,255,102,0.5); }
+  @keyframes barfill { from { width: 0; } }
+
+  .log { font-size: 12.5px; line-height: 2; }
+  .log .t { color: var(--phos-dim); }
+  .log .warn { color: var(--amber); }
+  .log .err { color: var(--red); text-shadow: 0 0 10px rgba(255,75,75,0.5); }
+
+  .ai-line { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 14px; font-size: 13px; line-height: 1.75; }
+  .ai-line .who { color: var(--amber); }
+</style>
+</head>
+<body>
+  <div class="crt">
+    <header>
+      <div class="logo">AVAADA.SYS</div>
+      <nav><a class="active" href="#">Today</a><a href="#">Calendar</a><a href="#">Meetings</a><a href="#">Actions</a></nav>
+      <div class="sysclock">10:18<i>:</i>42 IST</div>
+    </header>
+    <div class="statusbar">
+      <span>USR: <b>G.MISRA</b></span>
+      <span>DATE: <b>2026-06-29 FRI</b></span>
+      <span>MEETINGS: <b>05</b></span>
+      <span class="warn">ACTIONS DUE: 03</span>
+      <span>UPTIME: <b>OK</b></span>
+    </div>
+
+    <p class="prompt rs"><b>gyanpriya@avaada</b>:~$ ./briefing --today <span style="color:var(--phos)">▊</span></p>
+    <h1 class="ty">SYSTEMS NOMINAL.</h1>
+    <p class="subline rs r1">5 meetings scheduled // 3 actions in queue // focus window: 80 min <span class="cursor"></span></p>
+
+    <div class="grid">
+      <div>
+        <div class="panel rs r2">
+          <div class="panel-hd"><span>▸ NEXT_MEETING.exe</span><span class="dots">● ● ●</span></div>
+          <div class="panel-bd">
+            <div class="next-t">Product Sync — Q3 Roadmap</div>
+            <p class="meta">10:30–11:15 // GOOGLE_MEET // ROOM_4B // ATTENDEES: 07</p>
+            <div class="countdown">
+              <div class="cd"><div class="v">00</div><div class="k">HRS</div></div>
+              <div class="cd"><div class="v">12</div><div class="k">MIN</div></div>
+              <div class="cd"><div class="v">08</div><div class="k">SEC</div></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn">[ JOIN NOW ]</button>
+              <button class="btn ghost">[ VIEW PREP ]</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel rs r4" style="margin-top:18px;">
+          <div class="panel-hd"><span>▸ SCHEDULE — FRI 29</span><span>3H40M TOTAL</span></div>
+          <div class="panel-bd" style="padding: 8px 16px 14px;">
+            <table>
+              <tbody>
+                <tr class="tr-live"><td class="tdim">10:30</td><td>PRODUCT SYNC — Q3 ROADMAP</td><td align="right"><span class="tag">LIVE-NEXT</span></td></tr>
+                <tr><td class="tdim">12:00</td><td>LEADERSHIP STANDUP</td><td align="right"><span class="tag">LEAD</span></td></tr>
+                <tr><td class="tdim">14:30</td><td>DESIGN REVIEW — SOLAR DASH</td><td align="right"><span class="tag">DESIGN</span></td></tr>
+                <tr><td class="tdim">16:00</td><td>1:1 — RAHUL</td><td align="right"><span class="tag">PEOPLE</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel rs r3">
+          <div class="panel-hd"><span>▸ GAUGES</span><span class="dots">● ●</span></div>
+          <div class="panel-bd">
+            <div class="biggauge amber"><span class="v">03</span><span class="l">actions due // EOD</span></div>
+            <div class="biggauge"><span class="v">80m</span><span class="l">focus remaining</span></div>
+            <div class="bar"><i></i></div>
+          </div>
+        </div>
+
+        <div class="panel rs r4" style="margin-top:18px;">
+          <div class="panel-hd"><span>▸ EVENT_LOG</span></div>
+          <div class="panel-bd log">
+            <div><span class="t">[09:42]</span> prep notes compiled → product_sync</div>
+            <div><span class="t">[09:15]</span> <span class="warn">WARN: 2 meetings unprepped</span></div>
+            <div><span class="t">[08:50]</span> <span class="err">ERR: board_deck overdue +2d</span></div>
+          </div>
+        </div>
+
+        <div class="panel rs r5" style="margin-top:18px;">
+          <div class="panel-hd"><span>▸ AI_COPILOT v3.1</span><span class="dots">◉</span></div>
+          <div class="panel-bd">
+            <p class="ai-line" style="border:none;padding:0;"><span class="who">copilot&gt;</span> board_deck is your critical path. clear it before 14:30 design review. run morning brief? <b>[Y/n]</b><span class="cursor" style="display:inline-block;width:8px;height:13px;background:var(--phos);animation:blinkc 1s steps(1) infinite;"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

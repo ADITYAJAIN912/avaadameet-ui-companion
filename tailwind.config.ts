@@ -17,15 +17,24 @@ export default {
         },
         status: {
           success: 'var(--color-success)',
+          successMuted: 'var(--color-success-muted)',
           warning: 'var(--color-warning)',
+          warningMuted: 'var(--color-warning-muted)',
           danger: 'var(--color-danger)',
+          dangerMuted: 'var(--color-danger-muted)',
           info: 'var(--color-info)',
+          infoMuted: 'var(--color-info-muted)',
+        },
+        coral: {
+          DEFAULT: 'var(--accent-coral)',
+          muted: 'var(--accent-coral-muted)',
         },
         neutral: {
           bg: 'var(--surface-canvas)',
           border: 'var(--border-default)',
           muted: 'var(--text-tertiary)',
           text: 'var(--text-primary)',
+          inverse: 'var(--text-inverse)',
         },
         surface: {
           canvas: 'var(--surface-canvas)',
@@ -62,6 +71,7 @@ export default {
       },
       fontFamily: {
         sans: ['var(--font-family-sans)'],
+        display: ['var(--font-family-display)'],
         mono: ['var(--font-family-mono)'],
       },
       borderRadius: {
@@ -105,6 +115,13 @@ export default {
         out: 'var(--ease-out)',
         'in-out': 'var(--ease-in-out)',
         spring: 'var(--ease-spring)',
+      },
+      fontWeight: {
+        medium: '400',
+        semibold: '400',
+        bold: '400',
+        extrabold: '400',
+        black: '400',
       },
       zIndex: {
         raised: 'var(--z-raised)',

@@ -1,6 +1,5 @@
 @import './design-system/tokens.css';
 @import './design-system/components.css';
-@import './design-system/workspace.css';
 @import 'tailwindcss';
 @config '../tailwind.config.ts';
 
@@ -8,6 +7,14 @@
   body {
     @apply m-0 bg-surface-canvas font-sans text-neutral-text antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    background-image: var(--glow-canvas);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  ::selection {
+    background: rgba(32, 92, 66, 0.2);
+    color: var(--text-primary);
   }
 
   #root {
@@ -27,11 +34,11 @@
 
   /* Typography hierarchy */
   .text-section-title {
-    @apply text-card-title font-semibold tracking-tight text-neutral-text;
+    @apply text-card-title font-display font-bold tracking-tight text-neutral-text;
   }
 
   .text-card-heading {
-    @apply text-body font-semibold text-neutral-text;
+    @apply text-body font-display font-bold text-neutral-text;
   }
 
   .text-meta {
@@ -40,16 +47,16 @@
 
   /* Inputs */
   .input-field {
-    @apply w-full rounded-xl border border-neutral-border/80 bg-white py-2.5 pl-9 pr-4 text-body text-neutral-text shadow-elevation-1 outline-none transition-all duration-200 ease-out placeholder:text-neutral-muted focus:border-brand-teal/50 focus:shadow-elevation-2 focus:ring-2 focus:ring-brand-teal/20;
+    @apply w-full rounded-xl border border-neutral-border/80 bg-surface py-2.5 pl-9 pr-4 text-body text-neutral-text shadow-elevation-1 outline-none transition-all duration-200 ease-out placeholder:text-neutral-muted focus:border-brand-teal/50 focus:shadow-elevation-2 focus:ring-2 focus:ring-brand-teal/20;
   }
 
-  /* Surfaces — one elevation level (shadow-sm); avoid stacking shadows */
+  /* Surfaces — bento tiles with soft lift */
   .card-surface {
-    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm;
+    @apply rounded-lg border border-neutral-border/60 bg-surface shadow-sm;
   }
 
   .card-surface-interactive {
-    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm transition-colors duration-200 ease-out hover:border-brand-teal/25;
+    @apply rounded-lg border border-neutral-border/60 bg-surface shadow-sm transition-all duration-200 ease-out hover:-translate-y-[3px] hover:border-[#C9CDBE] hover:shadow-lg;
   }
 
   .card-hover-lift {
@@ -57,7 +64,7 @@
   }
 
   .card-surface-primary {
-    @apply rounded-xl border border-brand-teal/15 bg-white shadow-sm;
+    @apply rounded-xl border border-brand-teal/15 bg-surface shadow-sm;
   }
 
   .card-surface-secondary {
@@ -66,7 +73,7 @@
 
   /** Outer shell — shadow lives here; never add overflow-hidden on this node */
   .panel-surface {
-    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm;
+    @apply rounded-xl border border-neutral-border/60 bg-surface shadow-sm;
   }
 
   .panel-surface-accent {
@@ -79,7 +86,52 @@
   }
 
   .container-surface {
-    @apply rounded-xl border border-neutral-border/60 bg-white shadow-sm;
+    @apply rounded-xl border border-neutral-border/60 bg-surface shadow-sm;
+  }
+
+  /* ─── Signature motion utilities (Corporate Bento reveal) ──────── */
+  /* Staggered entrance: add .reveal to items, style with data-delay steps */
+  .reveal {
+    animation: rise-in var(--duration-slower) var(--ease-out) both;
+  }
+
+  .reveal-fade {
+    animation: fade-in var(--duration-slow) var(--ease-out) both;
+  }
+
+  .reveal-scale {
+    animation: scale-in var(--duration-slow) var(--ease-out) both;
+  }
+
+  .reveal-1 { animation-delay: 60ms; }
+  .reveal-2 { animation-delay: 120ms; }
+  .reveal-3 { animation-delay: 180ms; }
+  .reveal-4 { animation-delay: 240ms; }
+  .reveal-5 { animation-delay: 300ms; }
+  .reveal-6 { animation-delay: 360ms; }
+
+  /* Live pulse dot (in-progress meetings) */
+  .pulse-live {
+    animation: pulse-live 1.8s var(--ease-in-out) infinite;
+  }
+
+  /* Editorial index number (01 / 02 …) */
+  .index-num {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-micro);
+    letter-spacing: var(--letter-spacing-wider);
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Kicker — Fragment Mono uppercase eyebrow (mockup .kick) */
+  .kicker {
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-micro);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
   }
 
   /* Rows */
@@ -100,7 +152,7 @@
   }
 
   .row-overdue {
-    @apply bg-red-50/25 hover:bg-red-50/40;
+    @apply bg-status-dangerMuted/40 hover:bg-status-dangerMuted/60;
   }
 
   /* Buttons */
@@ -114,7 +166,7 @@
   }
 
   .chip-active {
-    @apply bg-brand-teal text-white;
+    @apply bg-brand-teal text-neutral-inverse;
   }
 
   .chip-inactive {
@@ -201,6 +253,6 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--divider-subtle);
     background: color-mix(in srgb, var(--surface-sunken) 45%, transparent);
-    padding: var(--space-2) var(--space-2-5);
+    padding: var(--space-3);
   }
 }

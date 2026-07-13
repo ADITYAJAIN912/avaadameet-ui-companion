@@ -18,16 +18,16 @@ export function Toggle({
   size = 'sm',
   indeterminate = false,
 }: ToggleProps) {
-  const trackSize = size === 'sm' ? 'h-5 w-9' : 'h-6 w-11'
-  const thumbSize = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'
+  const trackSize = size === 'sm' ? 'h-6 w-11' : 'h-7 w-[3.25rem]'
+  const thumbSize = size === 'sm' ? 'h-5 w-5' : 'h-6 w-6'
   const translate = indeterminate
     ? size === 'sm'
-      ? 'translate-x-2'
-      : 'translate-x-2.5'
+      ? 'translate-x-2.5'
+      : 'translate-x-3.5'
     : checked
       ? size === 'sm'
-        ? 'translate-x-4'
-        : 'translate-x-5'
+        ? 'translate-x-[1.375rem]'
+        : 'translate-x-[1.625rem]'
       : 'translate-x-0.5'
 
   const trackColor = indeterminate

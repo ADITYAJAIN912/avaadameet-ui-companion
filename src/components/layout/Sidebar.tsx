@@ -1,110 +1,92 @@
-import { NavLink } from 'react-router-dom'
-import {
-  Home,
-  Calendar,
-  Video,
-  CheckSquare,
-  PanelLeftClose,
-  PanelLeftOpen,
-} from 'lucide-react'
-import { useLayout } from '../../context/LayoutContext'
-import { getOpenActionCount } from '../../data/mockActionItems'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { Bell, Settings } from 'lucide-react'
+import { getInitials } from '../../utils/helpers'
+import { USER_NAME, USER_EMAIL } from '../../data/constants'
+import { useActionItems } from '../../context/ActionItemsContext'
 
 const navItems = [
-  { to: '/', icon: Home, label: 'Home', end: true },
-  { to: '/calendar', icon: Calendar, label: 'Calendar' },
-  { to: '/meetings', icon: Video, label: 'Meetings' },
-  { to: '/action-items', icon: CheckSquare, label: 'Action Items', badge: true },
+  { to: '/', label: 'Feed', end: true },
+  { to: '/calendar', label: 'Calendar' },
+  { to: '/meetings', label: 'Meetings' },
+  { to: '/action-items', label: 'Actions', badge: true },
 ]
 
 export function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar } = useLayout()
-  const actionCount = getOpenActionCount()
+  const navigate = useNavigate()
+  const { openActionCount } = useActionItems()
 
   return (
-    <aside
-      className={`hidden shrink-0 flex-col border-r border-neutral-border/80 bg-white ease-premium md:flex ${
-        sidebarCollapsed ? 'w-16' : 'w-[220px]'
-      }`}
-    >
-      <div className="flex h-14 items-center border-b border-neutral-border/80 px-4">
-        {sidebarCollapsed ? (
-          <div
-            className="mx-auto flex h-8 w-8 items-center justify-center rounded-xl bg-brand-teal text-sm font-semibold text-white shadow-elevation-1"
-            title="Avaada"
-          >
-            A
-          </div>
-        ) : (
-          <span className="text-base font-semibold tracking-tight text-brand-navy">Avaada</span>
-        )}
-      </div>
-
-      <nav className="flex-1 space-y-0.5 p-2" aria-label="Main navigation">
-        {navItems.map(({ to, icon: Icon, label, end, badge }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            title={sidebarCollapsed ? label : undefined}
-            className={({ isActive }) =>
-              `focus-ring group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-2.5 text-body ease-premium ${
-                isActive
-                  ? 'nav-item-active'
-                  : 'font-medium text-neutral-muted transition-colors duration-200 ease-out hover:bg-neutral-bg/80 hover:text-neutral-text'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <span
-                  className={`nav-item-active-bar ${
-                    isActive ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'
-                  }`}
-                />
-                <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
-                  <Icon
-                    className="h-5 w-5 ease-premium"
-                    strokeWidth={isActive ? 2.5 : 1.75}
-                  />
-                  {sidebarCollapsed && badge && actionCount > 0 && (
-                    <span
-                      className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-status-danger ring-2 ring-white"
-                      aria-label={`${actionCount} open action items`}
-                    />
-                  )}
-                </span>
-                {!sidebarCollapsed && (
-                  <>
-                    <span className="flex-1 leading-none">{label}</span>
-                    {badge && actionCount > 0 && (
-                      <span className="badge-pill bg-status-danger text-white shadow-elevation-1">
-                        {actionCount}
-                      </span>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="border-t border-neutral-border/80 p-2">
+    <aside className="hidden w-[260px] shrink-0 flex-col border-r border-neutral-border bg-surface lg:flex">
+      <div className="flex h-[4.25rem] items-center px-6 border-b border-neutral-border">
+        {/* Brand */}
         <button
           type="button"
-          onClick={toggleSidebar}
-          className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-neutral-muted ease-premium hover:border-neutral-border/70 hover:bg-neutral-bg/80 hover:text-neutral-text"
-          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          onClick={() => navigate('/')}
+          className="focus-ring group flex shrink-0 items-center gap-2.5 rounded-md px-1"
         >
-          {sidebarCollapsed ? (
-            <PanelLeftOpen className="h-5 w-5" strokeWidth={1.75} />
-          ) : (
-            <>
-              <PanelLeftClose className="h-5 w-5" strokeWidth={1.75} />
-              <span className="text-caption font-medium">Collapse</span>
-            </>
-          )}
+          <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-brand-teal text-[15px] font-extrabold text-neutral-inverse transition-transform duration-200 group-hover:scale-105">
+            A
+          </span>
+          <span className="text-[16px] font-bold tracking-tight text-neutral-text">
+            AvaadaMeet
+          </span>
+        </button>
+      </div>
+
+      <nav className="flex-1 px-4 py-6" aria-label="Primary">
+        <div className="text-micro font-semibold uppercase tracking-wider text-neutral-muted px-2 mb-3">Workspace</div>
+        <ul className="flex flex-col gap-1.5">
+          {navItems.map(({ to, label, end, badge }) => (
+            <li key={to}>
+              <NavLink
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  `focus-ring relative flex w-full items-center justify-between rounded-lg px-3 py-2 text-body transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-brand-tealLight font-semibold text-brand-teal'
+                      : 'text-neutral-muted hover:bg-[var(--interactive-hover)] hover:text-neutral-text'
+                  }`
+                }
+              >
+                {label}
+                {badge && openActionCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-bold leading-none text-neutral-inverse">
+                    {openActionCount}
+                  </span>
+                )}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Utilities */}
+      <div className="border-t border-neutral-border p-4">
+        <ul className="flex flex-col gap-1 mb-4">
+          <li>
+            <button className="focus-ring flex w-full items-center gap-3 rounded-lg px-3 py-2 text-body text-neutral-muted transition-colors hover:bg-[var(--interactive-hover)] hover:text-neutral-text">
+              <Bell className="h-4.5 w-4.5" strokeWidth={1.75} />
+              Notifications
+            </button>
+          </li>
+          <li>
+            <button className="focus-ring flex w-full items-center gap-3 rounded-lg px-3 py-2 text-body text-neutral-muted transition-colors hover:bg-[var(--interactive-hover)] hover:text-neutral-text">
+              <Settings className="h-4.5 w-4.5" strokeWidth={1.75} />
+              Settings
+            </button>
+          </li>
+        </ul>
+
+        {/* Profile */}
+        <button className="focus-ring flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-[var(--interactive-hover)] border border-neutral-border bg-surface-canvas shadow-xs">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-navy text-[12px] font-bold text-neutral-inverse">
+            {getInitials(USER_NAME)}
+          </span>
+          <div className="flex flex-col items-start overflow-hidden text-left">
+            <span className="truncate text-body font-semibold text-neutral-text">{USER_NAME}</span>
+            <span className="truncate text-caption text-neutral-muted">{USER_EMAIL}</span>
+          </div>
         </button>
       </div>
     </aside>

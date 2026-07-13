@@ -1,6 +1,5 @@
 import { forwardRef } from 'react'
 import { Search } from 'lucide-react'
-import { workspaceIcon } from '../../design-system/workspace'
 
 interface SearchInputProps {
   value: string
@@ -15,19 +14,19 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     forwardedRef,
   ) {
     return (
-      <div className={`search-input-shell ${className}`}>
-        <span className="search-input-icon" aria-hidden>
-          <Search className={workspaceIcon.md} strokeWidth={workspaceIcon.stroke} />
-        </span>
+      <label
+        className={`flex h-11 min-w-0 items-center gap-2.5 rounded-md border border-neutral-border bg-surface px-3 shadow-xs transition-colors focus-within:border-brand-teal hover:border-neutral-border ${className}`}
+      >
+        <Search className="h-4 w-4 shrink-0 text-neutral-muted" strokeWidth={1.75} aria-hidden />
         <input
           ref={forwardedRef}
           type="search"
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="search-input-field"
+          className="w-full bg-transparent text-body text-neutral-text outline-none placeholder:text-neutral-muted"
         />
-      </div>
+      </label>
     )
   },
 )

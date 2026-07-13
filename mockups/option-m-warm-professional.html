@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option M — Warm Professional</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --ink: #1F2A24;
+    --muted: #6E7A72;
+    --green: #1E5B45;
+    --green-soft: #E4EEE8;
+    --line: #E4E0D6;
+    --amber: #9A6A1E;
+    --red: #A83E36;
+    --clay: #C57B57;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Public Sans',sans-serif; background: var(--bg); color: var(--ink); }
+  .serif { font-family:'Newsreader',serif; }
+
+  @keyframes rise { from { opacity:0; transform: translateY(14px);} to {opacity:1; transform:none;} }
+  .r { animation: rise .6s cubic-bezier(0.16,1,0.3,1) both; }
+  .r1{animation-delay:.07s}.r2{animation-delay:.14s}.r3{animation-delay:.21s}.r4{animation-delay:.28s}.r5{animation-delay:.35s}
+
+  header { display:flex; align-items:center; justify-content:space-between; padding: 0 36px; height: 64px; border-bottom: 1px solid var(--line); background: var(--bg); position: sticky; top: 0; z-index: 30; }
+  .logo { display:flex; align-items:center; gap: 10px; }
+  .logo .mk { width: 30px; height: 30px; border-radius: 50%; background: var(--green); color: #F7F5F0; font-family:'Newsreader',serif; display:flex; align-items:center; justify-content:center; font-size: 15px; }
+  .logo b { font-size: 16px; font-weight: 700; letter-spacing:-0.01em; }
+  nav { display:flex; gap: 26px; }
+  nav a { text-decoration:none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 4px 0; border-bottom: 2px solid transparent; transition: all .2s; }
+  nav a:hover { color: var(--ink); }
+  nav a.on { color: var(--green); border-bottom-color: var(--green); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 12px; font-weight: 700; display:flex; align-items:center; justify-content:center; border: 1px solid #CBDCD2; }
+
+  main { max-width: 1020px; margin: 0 auto; padding: 40px 32px 80px; }
+  .greet { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 28px; }
+  .kick { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); font-weight: 700; }
+  h1 { font-family:'Newsreader',serif; font-size: 36px; font-weight: 600; letter-spacing:-0.01em; margin-top: 6px; }
+  .sub { color: var(--muted); font-size: 14.5px; margin-top: 6px; }
+  .btn { font-family:inherit; font-weight: 700; font-size: 14px; border-radius: 999px; padding: 11px 22px; cursor:pointer; transition: all .22s; }
+  .btn.green { background: var(--green); color: #F7F5F0; border: 1px solid var(--green); }
+  .btn.green:hover { background: #174A38; transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(30,91,69,0.5); }
+  .btn.out { background: transparent; border: 1px solid #C9C4B6; color: var(--ink); }
+  .btn.out:hover { border-color: var(--green); color: var(--green); }
+
+  .hero { display:flex; justify-content:space-between; align-items:center; gap: 24px; background: var(--green); color: #F2F7F4; border-radius: 18px; padding: 26px 30px; margin-bottom: 18px; position:relative; overflow:hidden; }
+  .hero::after { content:'❋'; position:absolute; right: 24px; bottom: -34px; font-size: 130px; opacity: 0.08; font-family:'Newsreader',serif; }
+  .hero .nx { display:inline-flex; align-items:center; gap: 8px; font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: #A9D2BC; }
+  .hero .nx i { width: 7px; height: 7px; border-radius: 50%; background: #7FC7A2; animation: p 1.7s ease infinite; }
+  @keyframes p { 50% { opacity: 0.3; } }
+  .hero h2 { font-family:'Newsreader',serif; font-size: 25px; font-weight: 600; margin: 9px 0 5px; }
+  .hero .m { font-size: 13.5px; color: #C4DCCE; }
+  .hero .btn { background: #F7F5F0; color: var(--green); border: none; position: relative; z-index: 1; }
+  .hero .btn:hover { transform: scale(1.04); }
+
+  .stats { display:grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 18px; }
+  @media(max-width:860px){ .stats{grid-template-columns:1fr;} }
+  .st { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; transition: all .25s; }
+  .st:hover { box-shadow: 0 6px 20px -8px rgba(31,42,36,0.14); transform: translateY(-2px); }
+  .st .l { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+  .st .v { font-family:'Newsreader',serif; font-size: 32px; font-weight: 600; margin-top: 8px; }
+  .st .f { font-size: 12.5px; font-weight: 600; margin-top: 3px; }
+  .st .f.red{color:var(--red);} .st .f.green{color:var(--green);} .st .f.dim{color:var(--muted);}
+
+  .cols { display:grid; grid-template-columns: 1.65fr 1fr; gap: 14px; }
+  @media(max-width:860px){ .cols{grid-template-columns:1fr;} }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow:hidden; }
+  .chd { display:flex; justify-content:space-between; align-items:baseline; padding: 16px 22px 12px; }
+  .chd h3 { font-family:'Newsreader',serif; font-size: 18px; font-weight: 600; }
+  .chd a { font-size: 13px; color: var(--green); font-weight: 700; text-decoration:none; }
+  .chd a:hover { text-decoration: underline; }
+
+  .row { display:flex; align-items:center; gap: 15px; padding: 14px 22px; border-top: 1px solid #F0EDE4; transition: background .15s; cursor:pointer; }
+  .row:hover { background: #FBFAF6; }
+  .tm { font-family:'DM Mono',monospace; font-size: 12px; color: var(--muted); min-width: 82px; }
+  .row .b { flex: 1; }
+  .row .n { font-weight: 600; font-size: 14.5px; }
+  .row .s { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+  .chip { font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 4px 11px; }
+  .chip.green { background: var(--green-soft); color: var(--green); }
+  .chip.amber { background: #F5EDDC; color: var(--amber); }
+  .chip.red { background: #F6E4E2; color: var(--red); }
+
+  .task { display:flex; align-items:center; gap: 12px; padding: 13px 22px; border-top: 1px solid #F0EDE4; }
+  .cb { width: 18px; height: 18px; border: 1.5px solid #C9C4B6; border-radius: 50%; cursor:pointer; transition: all .2s; flex-shrink:0; }
+  .cb:hover { border-color: var(--green); background: var(--green-soft); }
+  .task .t { font-size: 13.5px; font-weight: 600; flex: 1; }
+
+  .ai { padding: 20px 22px; }
+  .ai .h { display:flex; align-items:center; gap: 10px; margin-bottom: 11px; }
+  .ai .orb { width: 28px; height: 28px; border-radius: 50%; background: var(--green-soft); color: var(--green); display:flex; align-items:center; justify-content:center; font-size: 14px; }
+  .ai b.t { font-family:'Newsreader',serif; font-size: 16px; font-weight: 600; }
+  .ai p { font-size: 13.5px; line-height: 1.65; color: #46524B; }
+  .ai p b { color: var(--green); }
+  .ai .btn { margin-top: 14px; font-size: 13px; padding: 9px 18px; }
+</style>
+</head>
+<body>
+  <header class="r">
+    <div class="logo"><span class="mk">A</span><b>AvaadaMeet</b></div>
+    <nav><a class="on" href="#">Today</a><a href="#">Calendar</a><a href="#">Meetings</a><a href="#">Actions</a></nav>
+    <span class="avatar">GM</span>
+  </header>
+
+  <main>
+    <div class="greet r r1">
+      <div>
+        <span class="kick">Friday, 29 June</span>
+        <h1>Good morning, Gyanpriya</h1>
+        <p class="sub">5 meetings today · 3 actions due · 1h 20m of focus time protected.</p>
+      </div>
+      <button class="btn out">+ New meeting</button>
+    </div>
+
+    <div class="hero r r2">
+      <div>
+        <span class="nx"><i></i>Up next · in 12 minutes</span>
+        <h2>Product Sync — Q3 Roadmap</h2>
+        <p class="m">10:30 – 11:15 · Google Meet · 7 attendees · Prep notes ready</p>
+      </div>
+      <button class="btn">Join meeting →</button>
+    </div>
+
+    <div class="stats r r3">
+      <div class="st"><div class="l">Actions due today</div><div class="v">3</div><div class="f red">1 overdue — board deck</div></div>
+      <div class="st"><div class="l">Meetings needing prep</div><div class="v">2</div><div class="f dim">Before 14:30</div></div>
+      <div class="st"><div class="l">Focus time left</div><div class="v">1h 20m</div><div class="f green">+25m vs. usual</div></div>
+    </div>
+
+    <div class="cols">
+      <div class="card r r4">
+        <div class="chd"><h3>Today's schedule</h3><a href="#">Open calendar</a></div>
+        <div class="row"><span class="tm">10:30–11:15</span><div class="b"><div class="n">Product Sync — Q3 Roadmap</div><div class="s">Google Meet · 7 people</div></div><span class="chip green">Prepped</span></div>
+        <div class="row"><span class="tm">12:00–12:30</span><div class="b"><div class="n">Leadership standup</div><div class="s">Room 2A · 4 people</div></div><span class="chip amber">Prep needed</span></div>
+        <div class="row"><span class="tm">14:30–15:30</span><div class="b"><div class="n">Design review — Solar dashboard</div><div class="s">Google Meet · 6 people</div></div><span class="chip amber">Prep needed</span></div>
+        <div class="row"><span class="tm">16:00–16:25</span><div class="b"><div class="n">1:1 with Rahul</div><div class="s">Walk & talk</div></div><span class="chip green">Ready</span></div>
+      </div>
+
+      <div>
+        <div class="card r r4">
+          <div class="chd"><h3>Actions due</h3><a href="#">See all</a></div>
+          <div class="task"><span class="cb"></span><span class="t">Review board deck v3</span><span class="chip red">2d late</span></div>
+          <div class="task"><span class="cb"></span><span class="t">Send solar RFP shortlist</span><span class="chip amber">Today</span></div>
+          <div class="task"><span class="cb"></span><span class="t">Approve Q3 hiring plan</span><span class="chip amber">Today</span></div>
+        </div>
+
+        <div class="card r r5" style="margin-top:14px;">
+          <div class="ai">
+            <div class="h"><span class="orb">✦</span><b class="t">Companion brief</b></div>
+            <p>Prep notes for <b>Product Sync</b> are ready. The overdue <b>board deck</b> is today's critical path — clear it before 14:30.</p>
+            <button class="btn out">▸ Play 60-sec brief</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

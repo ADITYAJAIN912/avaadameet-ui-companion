@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option I — Kinetic Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #EFEB E3;
+    --bg2: #EFEBE3;
+    --ink: #101010;
+    --electric: #2418FF;
+    --acid: #D8FF3E;
+    --hot: #FF4D00;
+    --paper: #EFEBE3;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Manrope',sans-serif; background: var(--paper); color: var(--ink); overflow-x:hidden; }
+
+  @keyframes slideUpBig { from { opacity:0; transform: translateY(60px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes marq { to { transform: translateX(-50%); } }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+  @keyframes pingpong { 0%,100% { transform: translateX(0); } 50% { transform: translateX(10px); } }
+  .s { animation: slideUpBig .85s cubic-bezier(0.16,1,0.3,1) both; }
+  .s1{animation-delay:.08s}.s2{animation-delay:.18s}.s3{animation-delay:.28s}.s4{animation-delay:.38s}.s5{animation-delay:.48s}
+
+  header { display:flex; align-items:center; justify-content:space-between; padding: 20px 34px; }
+  .logo { font-family:'Unbounded'; font-weight: 900; font-size: 17px; letter-spacing: -0.5px; }
+  nav { display:flex; gap: 26px; }
+  nav a { text-decoration:none; color: var(--ink); font-weight: 700; font-size: 14px; position: relative; }
+  nav a.active::after { content:''; position:absolute; left:-6px; right:-6px; top:52%; height: 11px; background: var(--acid); z-index:-1; }
+  nav a:hover { color: var(--electric); }
+  .badge-live { font-size: 12px; font-weight: 800; background: var(--ink); color: var(--acid); border-radius: 999px; padding: 9px 18px; letter-spacing: 1px; }
+
+  /* Giant kinetic headline */
+  .poster { padding: 26px 0 8px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); overflow: hidden; }
+  .poster-track { display: flex; white-space: nowrap; animation: marq 16s linear infinite; width: max-content; }
+  .poster h1 { font-family:'Unbounded'; font-weight: 900; font-size: clamp(64px, 10vw, 130px); line-height: 0.95; letter-spacing: -3px; text-transform: uppercase; padding-right: 60px; }
+  .poster h1 .o { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+  .poster h1 .e { color: var(--electric); }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 40px 34px 90px; }
+  .intro { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 26px; gap: 24px; }
+  .intro .who { font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .intro .who b { background: var(--acid); padding: 2px 8px; }
+  .intro .count { font-family:'Unbounded'; font-weight: 900; font-size: 15px; display:flex; align-items:center; gap:12px; }
+  .spin { width: 44px; height: 44px; animation: spinSlow 9s linear infinite; }
+
+  .board { display:grid; grid-template-columns: 1.55fr 1fr; gap: 0; border: 2px solid var(--ink); }
+  @media (max-width:900px){ .board { grid-template-columns: 1fr; } }
+
+  .cell { padding: 30px; border-right: 2px solid var(--ink); }
+  .cell:last-child { border-right: none; }
+
+  .next-k { display:inline-flex; align-items:center; gap: 10px; font-weight: 800; font-size: 12px; letter-spacing: 2.5px; background: var(--hot); color: #fff; padding: 8px 16px; border-radius: 999px; }
+  .next-k .d { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: pingpong 1s ease infinite; }
+  .next-title { font-family:'Unbounded'; font-weight: 700; font-size: clamp(28px, 3.4vw, 44px); letter-spacing: -1.5px; line-height: 1.05; margin: 20px 0 10px; text-transform: uppercase; }
+  .next-meta { font-weight: 600; font-size: 15px; color: #555; margin-bottom: 28px; }
+  .joinbar { display:flex; gap: 0; border: 2px solid var(--ink); width: fit-content; }
+  .join {
+    font-family:'Unbounded'; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; cursor:pointer; text-transform: uppercase;
+    background: var(--electric); color: #fff; border: none; padding: 18px 36px; transition: all .2s;
+  }
+  .join:hover { background: var(--ink); }
+  .prep { display:flex; align-items:center; font-weight: 800; font-size: 13px; padding: 0 26px; background: var(--acid); border-left: 2px solid var(--ink); cursor: pointer; transition: background .2s; }
+  .prep:hover { background: #fff; }
+
+  .sched-hd { display:flex; justify-content:space-between; font-family:'Unbounded'; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding-bottom: 14px; }
+  .srow { display:grid; grid-template-columns: 56px 1fr auto; gap: 18px; align-items: center; padding: 17px 4px; border-top: 2px solid var(--ink); cursor:pointer; transition: all .18s; position: relative; }
+  .srow:hover { background: var(--acid); padding-left: 14px; }
+  .srow .t { font-weight: 800; font-size: 14px; }
+  .srow .n { font-weight: 700; font-size: 17px; }
+  .srow .arr { font-family:'Unbounded'; font-weight: 900; }
+  .srow.live { background: var(--ink); color: #fff; }
+  .srow.live:hover { background: var(--electric); padding-left: 4px; }
+  .srow.live .t { color: var(--acid); }
+
+  .stat-big { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 20px; }
+  .stat-big .n { font-family:'Unbounded'; font-weight: 900; font-size: 76px; line-height: 0.95; letter-spacing: -3px; }
+  .stat-big .n.hot { color: var(--hot); }
+  .stat-big .l { font-weight: 800; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; }
+
+  .warnbox { background: var(--hot); color:#fff; padding: 20px; margin-bottom: 20px; transform: rotate(-0.6deg); transition: transform .25s cubic-bezier(0.34,1.56,0.64,1); }
+  .warnbox:hover { transform: rotate(0.4deg) scale(1.02); }
+  .warnbox .wk { font-weight: 800; font-size: 11px; letter-spacing: 2.5px; }
+  .warnbox p { font-family:'Unbounded'; font-weight: 700; font-size: 17px; margin-top: 8px; line-height: 1.25; }
+
+  .aibox { border: 2px solid var(--ink); padding: 20px; background: #fff; }
+  .aibox .ak { display:flex; align-items:center; gap: 10px; font-weight: 800; font-size: 12px; letter-spacing: 2px; }
+  .aibox .ak .sq { width: 14px; height: 14px; background: var(--electric); animation: spinSlow 4s linear infinite; }
+  .aibox p { font-weight: 600; font-size: 15px; line-height: 1.5; margin: 12px 0 16px; }
+  .aibox button { font-family:'Unbounded'; font-weight: 700; font-size: 12px; background: var(--ink); color: var(--acid); border: none; padding: 13px 22px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all .2s; }
+  .aibox button:hover { background: var(--electric); color: #fff; }
+
+  .footer-marq { margin-top: 46px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); overflow:hidden; padding: 10px 0; }
+  .fm-track { display:inline-flex; white-space:nowrap; animation: marq 14s linear infinite; font-weight: 800; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+  .fm-track span { padding: 0 26px; } .fm-track .a { color: var(--electric); }
+</style>
+</head>
+<body>
+  <header class="s">
+    <div class="logo">AVAADA®</div>
+    <nav>
+      <a class="active" href="#">Today</a><a href="#">Calendar</a><a href="#">Meetings</a><a href="#">Actions</a>
+    </nav>
+    <span class="badge-live">GM · ONLINE</span>
+  </header>
+
+  <div class="poster s s1">
+    <div class="poster-track">
+      <h1>Friday <span class="o">Agenda</span> — Five <span class="e">Meetings</span>&nbsp;· </h1>
+      <h1>Friday <span class="o">Agenda</span> — Five <span class="e">Meetings</span>&nbsp;· </h1>
+    </div>
+  </div>
+
+  <main>
+    <div class="intro s s2">
+      <span class="who">Good morning, <b>GYANPRIYA MISRA</b> — Jun 29, 2026</span>
+      <span class="count"><svg class="spin" viewBox="0 0 100 100"><path id="c" fill="none" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/><text font-size="11.5" font-weight="700" letter-spacing="2.5"><textPath href="#c">TODAY•TODAY•TODAY•TODAY•TODAY•</textPath></text></svg>05/05</span>
+    </div>
+
+    <div class="board s s3">
+      <div class="cell">
+        <span class="next-k"><span class="d"></span>NEXT — IN 12 MIN</span>
+        <h2 class="next-title">Product Sync — Q3 Roadmap</h2>
+        <p class="next-meta">10:30–11:15 · Google Meet · 7 attendees · Room 4B</p>
+        <div class="joinbar">
+          <button class="join">Join now →</button>
+          <span class="prep">60-SEC PREP</span>
+        </div>
+
+        <div style="height: 38px;"></div>
+        <div class="sched-hd"><span>Schedule</span><span>3H 40M</span></div>
+        <div class="srow live"><span class="t">10:30</span><span class="n">Product Sync — Q3 Roadmap</span><span class="arr">→</span></div>
+        <div class="srow"><span class="t">12:00</span><span class="n">Leadership standup</span><span class="arr">→</span></div>
+        <div class="srow"><span class="t">14:30</span><span class="n">Design review — Solar dashboard</span><span class="arr">→</span></div>
+        <div class="srow"><span class="t">16:00</span><span class="n">1:1 with Rahul</span><span class="arr">→</span></div>
+      </div>
+
+      <div class="cell">
+        <div class="stat-big s s4"><div class="n hot">03</div><div class="l">Actions due today</div></div>
+        <div class="warnbox s s4">
+          <span class="wk">⚠ OVERDUE +2 DAYS</span>
+          <p>BOARD DECK REVIEW — CLEAR IT BEFORE 14:30</p>
+        </div>
+        <div class="aibox s s5">
+          <span class="ak"><span class="sq"></span>AI COMPANION</span>
+          <p>"Prep notes for Product Sync are ready. Want your 60-second morning brief?"</p>
+          <button>Play brief</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-marq s s5">
+      <div class="fm-track">
+        <span>NEXT: PRODUCT SYNC 10:30</span><span class="a">●</span><span>3 ACTIONS DUE</span><span class="a">●</span><span>FOCUS WINDOW 80 MIN</span><span class="a">●</span><span>18 MEETINGS THIS WEEK</span><span class="a">●</span>
+        <span>NEXT: PRODUCT SYNC 10:30</span><span class="a">●</span><span>3 ACTIONS DUE</span><span class="a">●</span><span>FOCUS WINDOW 80 MIN</span><span class="a">●</span><span>18 MEETINGS THIS WEEK</span><span class="a">●</span>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

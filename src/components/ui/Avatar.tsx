@@ -14,7 +14,7 @@ const sizeClasses = {
 }
 
 const ringClasses =
-  'ring-2 ring-white shadow-sm border border-white/80 transition-all duration-200 ease-out'
+  'ring-2 ring-surface-raised shadow-sm border border-neutral-border transition-all duration-200 ease-out'
 
 export function Avatar({ name, email, avatarUrl, size = 'sm', className = '' }: AvatarProps) {
   if (avatarUrl) {

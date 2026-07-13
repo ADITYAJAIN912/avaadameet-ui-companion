@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option L — Corporate Navy & Gold</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0E1726;
+    --panel: #16223A;
+    --panel-2: #1C2A46;
+    --line: rgba(198,214,240,0.12);
+    --ink: #EDF2FB;
+    --muted: #8FA0BE;
+    --gold: #D8B368;
+    --gold-deep: #B8934A;
+    --teal: #4FD1B5;
+    --red: #F08A7E;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Libre Franklin',sans-serif; background: var(--bg); color: var(--ink); }
+  .serif { font-family:'Source Serif 4',serif; }
+  .mono { font-family:'Spline Sans Mono',monospace; }
+
+  @keyframes rise { from { opacity:0; transform: translateY(16px);} to {opacity:1; transform:none;} }
+  .r { animation: rise .6s cubic-bezier(0.16,1,0.3,1) both; }
+  .r1{animation-delay:.08s}.r2{animation-delay:.16s}.r3{animation-delay:.24s}.r4{animation-delay:.32s}.r5{animation-delay:.4s}
+
+  .shell { display:grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+
+  aside { border-right: 1px solid var(--line); padding: 26px 18px; display:flex; flex-direction:column; gap: 28px; background: #0B1320; }
+  .brand { display:flex; align-items:center; gap: 10px; padding: 0 8px; }
+  .brand .mk { width: 30px; height: 30px; border: 1px solid var(--gold); color: var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Source Serif 4',serif; font-weight: 700; font-size: 15px; }
+  .brand b { font-size: 15px; letter-spacing: 0.02em; font-weight: 700; }
+  .brand small { display:block; font-size: 9.5px; letter-spacing: 0.22em; color: var(--gold); font-weight: 600; }
+  .nv { display:flex; flex-direction:column; gap: 3px; }
+  .nv span.cap { font-size: 10px; letter-spacing: 0.2em; color: var(--muted); font-weight: 700; padding: 0 10px; margin-bottom: 6px; }
+  .nv a { display:flex; align-items:center; gap: 11px; text-decoration:none; color: var(--muted); font-size: 13.5px; font-weight: 600; padding: 9px 10px; border-radius: 6px; border-left: 2px solid transparent; transition: all .2s; }
+  .nv a:hover { color: var(--ink); background: rgba(216,179,104,0.05); }
+  .nv a.on { color: var(--gold); background: rgba(216,179,104,0.08); border-left-color: var(--gold); border-radius: 0 6px 6px 0; }
+  .me { margin-top: auto; display:flex; gap: 10px; align-items:center; padding: 12px 10px; border-top: 1px solid var(--line); }
+  .me .av { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(140deg,#D8B368,#8A6A2E); color:#0B1320; font-weight: 800; font-size: 12px; display:flex; align-items:center; justify-content:center; }
+  .me b { font-size: 13px; display:block; } .me small { font-size: 11px; color: var(--muted); }
+
+  main { padding: 34px 40px 70px; max-width: 1060px; }
+  .top { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 30px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.24em; color: var(--gold); font-weight: 700; text-transform: uppercase; }
+  h1 { font-family:'Source Serif 4',serif; font-size: 32px; font-weight: 700; margin-top: 8px; letter-spacing: 0.005em; }
+  .date { font-size: 13px; color: var(--muted); font-weight: 500; margin-top: 6px; }
+  .btn { font-family:inherit; cursor:pointer; font-weight: 700; font-size: 13px; letter-spacing: 0.04em; padding: 12px 22px; transition: all .22s; }
+  .btn.gold { background: var(--gold); border: 1px solid var(--gold); color: #10192B; }
+  .btn.gold:hover { background: var(--gold-deep); border-color: var(--gold-deep); }
+  .btn.line { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+  .btn.line:hover { border-color: var(--gold); color: var(--gold); }
+
+  .hero { display:grid; grid-template-columns: 1fr auto; gap: 24px; align-items:center; background: linear-gradient(120deg, var(--panel), var(--panel-2)); border: 1px solid var(--line); border-top: 2px solid var(--gold); padding: 26px 30px; margin-bottom: 16px; }
+  .live { display:inline-flex; align-items:center; gap: 8px; font-size: 11px; letter-spacing: 0.18em; font-weight: 700; color: var(--teal); text-transform: uppercase; }
+  .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: bl 1.7s ease infinite; }
+  @keyframes bl { 50% { opacity: 0.25; } }
+  .hero h2 { font-family:'Source Serif 4',serif; font-size: 24px; font-weight: 700; margin: 10px 0 6px; }
+  .hero .meta { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .hero .meta b { color: var(--ink); font-weight: 600; }
+
+  .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+  @media(max-width:900px){ .grid{grid-template-columns:1fr;} }
+  .kpi { background: var(--panel); border: 1px solid var(--line); padding: 18px 20px; transition: border-color .25s, transform .25s; }
+  .kpi:hover { border-color: rgba(216,179,104,0.45); transform: translateY(-2px); }
+  .kpi .lbl { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .kpi .val { font-family:'Source Serif 4',serif; font-size: 34px; font-weight: 700; margin-top: 10px; }
+  .kpi .sub { font-size: 12px; margin-top: 4px; font-weight: 600; }
+  .kpi .sub.red { color: var(--red); } .kpi .sub.teal { color: var(--teal); } .kpi .sub.dim { color: var(--muted); }
+
+  .cols { display:grid; grid-template-columns: 1.7fr 1fr; gap: 14px; }
+  @media(max-width:900px){ .cols{grid-template-columns:1fr;} }
+  .panel { background: var(--panel); border: 1px solid var(--line); }
+  .p-hd { display:flex; justify-content:space-between; align-items:center; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+  .p-hd h3 { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+  .p-hd a { font-size: 12px; color: var(--gold); text-decoration: none; font-weight: 700; letter-spacing: 0.06em; }
+  .p-hd a:hover { text-decoration: underline; }
+
+  .row { display:flex; align-items:center; gap: 16px; padding: 15px 22px; border-bottom: 1px solid var(--line); transition: background .18s; cursor: pointer; }
+  .row:last-child { border-bottom: none; }
+  .row:hover { background: rgba(216,179,104,0.04); }
+  .row .tm { font-family:'Spline Sans Mono',monospace; font-size: 12px; color: var(--gold); min-width: 84px; }
+  .row .b { flex:1; }
+  .row .nm { font-weight: 600; font-size: 14.5px; letter-spacing: 0.01em; }
+  .row .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tag { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; padding: 4px 10px; border: 1px solid; }
+  .tag.teal { color: var(--teal); border-color: rgba(79,209,181,0.4); }
+  .tag.gold { color: var(--gold); border-color: rgba(216,179,104,0.4); }
+  .tag.red { color: var(--red); border-color: rgba(240,138,126,0.4); }
+
+  .act { display:flex; align-items:center; gap: 13px; padding: 14px 22px; border-bottom: 1px solid var(--line); }
+  .act:last-child { border: none; }
+  .sq { width: 16px; height: 16px; border: 1px solid var(--muted); cursor: pointer; transition: all .2s; flex-shrink:0; }
+  .sq:hover { border-color: var(--gold); background: rgba(216,179,104,0.15); }
+  .act .t { font-size: 13.5px; font-weight: 600; flex: 1; }
+
+  .brief { padding: 20px 22px; }
+  .brief .bh { display:flex; align-items:center; gap: 10px; margin-bottom: 12px; }
+  .brief .orb { width: 28px; height: 28px; border: 1px solid var(--gold); color: var(--gold); display:flex; align-items:center; justify-content:center; font-size: 13px; }
+  .brief b.tt { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .brief p { font-size: 13.5px; line-height: 1.65; color: #C3CDE0; }
+  .brief p b { color: var(--gold); font-weight: 700; }
+  .brief .btn { margin-top: 16px; width: 100%; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="r">
+    <div class="brand"><span class="mk">A</span><div><b>AvaadaMeet</b><small>EXECUTIVE</small></div></div>
+    <div class="nv">
+      <span class="cap">WORKSPACE</span>
+      <a class="on" href="#">◈ Today</a>
+      <a href="#">▦ Calendar</a>
+      <a href="#">◫ Meetings</a>
+      <a href="#">☑ Actions</a>
+      <a href="#">✦ Companion</a>
+    </div>
+    <div class="me"><span class="av">GM</span><div><b>Gyanpriya Misra</b><small>Chief of Staff</small></div></div>
+  </aside>
+
+  <main>
+    <div class="top r r1">
+      <div>
+        <span class="eyebrow">Daily Briefing</span>
+        <h1>Good morning, Gyanpriya</h1>
+        <p class="date">Friday, 29 June 2026 · 5 engagements · 3 actions due</p>
+      </div>
+      <button class="btn line">+ Schedule</button>
+    </div>
+
+    <div class="hero r r2">
+      <div>
+        <span class="live"><i></i>Next Engagement · 12 min</span>
+        <h2>Product Sync — Q3 Roadmap</h2>
+        <p class="meta"><b>10:30 – 11:15</b> · Google Meet · 7 attendees · Prep dossier ready</p>
+      </div>
+      <button class="btn gold">Join Meeting →</button>
+    </div>
+
+    <div class="grid r r3">
+      <div class="kpi"><div class="lbl">Actions Due</div><div class="val">3</div><div class="sub red">1 overdue — Board deck</div></div>
+      <div class="kpi"><div class="lbl">Require Prep</div><div class="val">2</div><div class="sub dim">Before 14:30</div></div>
+      <div class="kpi"><div class="lbl">Focus Remaining</div><div class="val">1h 20m</div><div class="sub teal">+25 min vs. average</div></div>
+    </div>
+
+    <div class="cols">
+      <div class="panel r r4">
+        <div class="p-hd"><h3>Today's Schedule</h3><a href="#">Full calendar</a></div>
+        <div class="row"><span class="tm">10:30–11:15</span><div class="b"><div class="nm">Product Sync — Q3 Roadmap</div><div class="sub">Google Meet · 7 attendees</div></div><span class="tag teal">Prepped</span></div>
+        <div class="row"><span class="tm">12:00–12:30</span><div class="b"><div class="nm">Leadership Standup</div><div class="sub">Boardroom 2A · 4 attendees</div></div><span class="tag gold">Prep</span></div>
+        <div class="row"><span class="tm">14:30–15:30</span><div class="b"><div class="nm">Design Review — Solar Dashboard</div><div class="sub">Google Meet · 6 attendees</div></div><span class="tag gold">Prep</span></div>
+        <div class="row"><span class="tm">16:00–16:25</span><div class="b"><div class="nm">1:1 with Rahul</div><div class="sub">Walk & talk</div></div><span class="tag teal">Ready</span></div>
+      </div>
+
+      <div>
+        <div class="panel r r4">
+          <div class="p-hd"><h3>Actions Due</h3><a href="#">View all</a></div>
+          <div class="act"><span class="sq"></span><span class="t">Review board deck v3</span><span class="tag red">2d late</span></div>
+          <div class="act"><span class="sq"></span><span class="t">Send solar RFP shortlist</span><span class="tag gold">Today</span></div>
+          <div class="act"><span class="sq"></span><span class="t">Approve Q3 hiring plan</span><span class="tag gold">Today</span></div>
+        </div>
+
+        <div class="panel r r5" style="margin-top:14px;">
+          <div class="brief">
+            <div class="bh"><span class="orb">✦</span><b class="tt">Companion Brief</b></div>
+            <p>Prep notes for <b>Product Sync</b> are ready. The overdue <b>board deck</b> is your critical path today — clear it before the 14:30 design review.</p>
+            <button class="btn line">▸ Play 60-second brief</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -5,9 +5,9 @@ Quality bar: Linear · Notion · Stripe.
 
 **Token source of truth:** `src/design-system/tokens.css`  
 **Component patterns:** `src/design-system/components.css` (`ds-*` classes)  
-**TypeScript API:** `src/design-system/index.ts`
+**Workspace layout tokens:** `src/design-system/workspace.ts` (`ws.*`/`wsBadge.*`)
 
-> Components are not migrated yet. New work should use tokens and `ds-*` patterns. Legacy classes (`card-surface`, `panel-surface`, etc.) remain until phased migration.
+> Components are not fully migrated. New work should use tokens and `ds-*` patterns where practical. Legacy classes (`card-surface`, `panel-surface`, etc.) remain in active use. Meetings and Action Items use a separate, newer system — see `src/components/meetings/workspace/meetingsWorkspace.css` (`mw-*` classes) and `docs/HANDOFF.md` for why.
 
 ---
 
@@ -291,10 +291,12 @@ Classes: `ds-transition-colors`, `ds-transition-opacity`
 ```
 src/design-system/
 ├── tokens.css       # CSS custom properties (source of truth)
-├── primitives.ts    # Raw values (TS)
-├── semantic.ts      # Semantic roles (TS)
 ├── components.css   # ds-* component patterns
-└── index.ts         # Public exports
+├── workspace.css    # workspace-*/ws.* layout patterns (Meetings, Action Items shell)
+└── workspace.ts     # TS token objects (ws, wsBadge) for workspace.css classes
+
+src/components/meetings/workspace/
+└── meetingsWorkspace.css   # mw-* classes — the current system for Meetings & Action Items
 
 tailwind.config.ts   # Theme wired to CSS variables
 src/index.css        # Imports tokens + legacy bridge
@@ -302,4 +304,4 @@ src/index.css        # Imports tokens + legacy bridge
 
 ---
 
-*Version 1.0 — tokens first; component migration follows IA redesign approval.*
+*Version 1.0 — tokens first; component migration is ongoing, not blocked on a redesign approval.*

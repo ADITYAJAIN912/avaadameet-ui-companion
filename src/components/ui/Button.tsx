@@ -9,11 +9,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-brand-teal text-white shadow-elevation-1 hover:bg-brand-teal/90 btn-premium',
+    'h-11 px-4 bg-brand-teal text-neutral-inverse hover:bg-brand-tealHover btn-premium',
   secondary:
-    'border border-neutral-border/80 bg-white text-neutral-text shadow-elevation-1 hover:bg-neutral-bg btn-premium',
-  ghost: 'text-neutral-muted hover:bg-neutral-bg/80 hover:text-neutral-text btn-premium',
-  icon: 'p-2.5 text-neutral-muted hover:bg-neutral-bg/80 hover:text-neutral-text btn-premium',
+    'h-11 px-4 border border-neutral-border/80 bg-surface text-neutral-text shadow-xs hover:bg-[var(--interactive-hover)] btn-premium',
+  ghost: 'h-11 px-3 text-neutral-muted hover:bg-[var(--interactive-hover)] hover:text-neutral-text btn-premium',
+  icon: 'p-2.5 text-neutral-muted hover:bg-[var(--interactive-hover)] hover:text-neutral-text btn-premium',
 }
 
 export function Button({
@@ -43,7 +43,7 @@ export function IconButton({
     <button
       type="button"
       aria-label={ariaLabel}
-      className={`focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-lg text-neutral-muted ease-premium hover:bg-white hover:text-neutral-text disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-lg text-neutral-muted ease-premium hover:bg-surface hover:text-neutral-text disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       {...props}
     >
       {children}

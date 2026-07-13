@@ -4,7 +4,7 @@ High-fidelity frontend prototype for Avaada's internal meeting intelligence prod
 
 ## Overview
 
-AvaadaMeet surfaces meetings, action items, and an AI companion panel in a compact enterprise layout: persistent left sidebar, top bar, and four primary routes. State for meetings (including auto-join toggles) is held in React context so Home and Meetings stay in sync.
+AvaadaMeet surfaces meetings, action items, a calendar, and a global AI assistant in a compact enterprise layout: persistent left sidebar, top bar, and four primary routes. Meetings and Action Items use a shared three-column "workspace" layout (queue → detail → knowledge panel). State for meetings (including auto-join toggles) is held in React context so Home and Meetings stay in sync.
 
 ## Tech Stack
 
@@ -13,29 +13,31 @@ AvaadaMeet surfaces meetings, action items, and an AI companion panel in a compa
 | Framework | React 19 + TypeScript |
 | Build | Vite 8 |
 | Routing | react-router-dom v7 |
-| Styling | Tailwind CSS v4 + design tokens in `index.css` |
+| Styling | Tailwind CSS v4 + design tokens (`src/index.css`, `src/design-system/`) |
 | Icons | lucide-react |
-| Visual QA | Playwright (`scripts/verify.mjs`) |
 
 ## Folder Structure
 
 ```
 src/
 ├── components/
-│   ├── ui/              # Reusable primitives (Badge, Card, Toggle, SearchInput, …)
-│   ├── layout/          # App shell (Sidebar, TopBar, CompanionPanel, …)
-│   ├── home/            # Home-specific sections (Upcoming, Recent)
-│   ├── meetings/        # Meetings list/grid (rows, cards, filters)
-│   └── action-items/    # Action items list and kanban
-├── context/             # MeetingsContext, LayoutContext
+│   ├── ui/              # Reusable primitives (Button, Card, Toggle, SearchInput, …)
+│   ├── layout/          # App shell (Sidebar, TopBar, MobileTabBar)
+│   ├── home/            # Home-specific sections (Upcoming, Dashboard brief)
+│   ├── meetings/        # Meetings workspace (queue, review, knowledge panel)
+│   ├── calendar/        # Calendar views (month/week/day, mini calendar)
+│   ├── workspace/       # Shared workspace primitives + AI copilot config builders
+│   └── ai-copilot/      # Global "Ask Avaada AI" floating button + draggable dialog
+├── context/             # MeetingsContext, LayoutContext, AiCopilotContext
 ├── data/                # Mock arrays + app constants
+├── design-system/       # CSS tokens + component classes shared across pages
 ├── hooks/               # useCountUp, usePageLoading
 ├── pages/               # Route-level page components
 ├── types/               # Shared TypeScript interfaces
-├── utils/               # Pure helpers (dates, meeting queries, badge variants)
+├── utils/               # Pure helpers (dates, meeting queries, metadata)
 ├── App.tsx
 ├── main.tsx
-└── index.css            # Design system utilities
+└── index.css            # Global styles + design token imports
 ```
 
 ## Project Architecture
@@ -43,25 +45,42 @@ src/
 ```
 main.tsx
   └── App.tsx
-        ├── LayoutProvider        (sidebar collapse, companion panel)
-        └── MeetingsProvider      (meetings + derived stats)
+        ├── LayoutProvider              (sidebar collapse)
+        ├── MeetingsProvider            (meetings + derived stats)
+        ├── ActionItemsProvider         (simple action item list + stats)
+        ├── ActionWorkspaceProvider     (action item workspace detail)
+        ├── CalendarProvider            (calendar events)
+        ├── DashboardInsightsProvider   (Home "Today's Brief" content)
+        └── AiCopilotProvider           (global AI assistant state)
               └── AppLayout
                     ├── Sidebar / TopBar / MobileTabBar
                     ├── <Outlet />  → pages/*
-                    └── CompanionPanel (overlay)
+                    ├── AiCopilotFab (floating trigger, every page)
+                    └── AiCopilotDialog (draggable/resizable, every page)
 ```
 
-**MeetingsContext** is the single source of truth for meeting data and derived values (`upcomingForHome`, `recentToday`, week/upcoming counts). **LayoutContext** controls sidebar collapse and the companion drawer.
+Every page/component reads data through one of these contexts — never by importing `data/mock*.ts` directly. This is the integration seam: swapping mock data for a real API means editing the provider file, not the component tree. See `docs/HANDOFF.md` for the full breakdown of which context backs which screen.
 
-Mock time is anchored to `TODAY` (`2026-06-29`) and `MOCK_NOW_TIME` (`12:00pm`) in `src/data/constants.ts`. All “upcoming”, “past”, and relative due-date logic reads from these constants.
+**LayoutContext** controls sidebar collapse. **AiCopilotContext** tracks which meeting/action item context the AI assistant should open with, set by whichever workspace page currently has an item selected.
+
+Mock time is anchored to `TODAY` and `MOCK_NOW_TIME` in `src/data/constants.ts`. All "upcoming", "past", and relative due-date logic reads from these constants.
+
+## Meetings & Action Items Workspace
+
+Both pages share a dedicated visual system under `src/components/meetings/workspace/meetingsWorkspace.css` (`mw-*` classes) — a three-column layout: an item queue (left), a review/detail panel (center), and a knowledge panel showing related context (right). See `docs/HANDOFF.md` for the full breakdown and a note on why this is a separate stylesheet from the older `design-system/workspace.css`.
+
+## Global AI Assistant
+
+A floating "Ask Avaada AI" button appears on every page (bottom-right). Opening it with no meeting/action item selected shows a picker to search and choose one, or ask a general question. The dialog is fully draggable (by its header) and resizable (all edges + corners), and does not block interaction with the rest of the app. All responses are canned mock data — see `src/components/workspace/copilot/`.
 
 ## Component Organization
 
 | Category | Examples |
 |----------|----------|
-| **UI primitives** | `Button`, `Card`, `Badge`, `ActionStatusBadge`, `PriorityBadge`, `Toggle`, `Chip`, `SearchInput`, `EmptyState`, `StatCard`, `ViewToggle` |
-| **Layout** | `AppLayout`, `Sidebar`, `TopBar`, `MobileTabBar`, `CompanionPanel` |
-| **Domain** | `MeetingListRow`, `MeetingCard`, `ActionItemRow`, `KanbanBoard`, `MeetingMetadata` |
+| **UI primitives** | `Button`, `Card`, `Toggle`, `SegmentedControl`, `SearchInput`, `EmptyState`, `StatCard`, `Avatar` |
+| **Layout** | `AppLayout`, `Sidebar`, `TopBar`, `MobileTabBar` |
+| **Workspace** | `AttentionQueue`, `KnowledgePanel`, `MeetingWorkspace` (Meetings); inline `mw-*` markup (Action Items) |
+| **AI Assistant** | `AiCopilotFab`, `AiCopilotDialog`, `AiCopilotPicker` |
 
 Feature-specific components live under `components/<feature>/`. Cross-cutting primitives live under `components/ui/`.
 
@@ -70,19 +89,23 @@ Feature-specific components live under `components/<feature>/`. Cross-cutting pr
 | File | Contents |
 |------|----------|
 | `data/constants.ts` | `TODAY`, `MOCK_NOW_TIME`, `USER_NAME`, `USER_EMAIL` |
-| `data/mockMeetings.ts` | 20 meetings (re-exports types/constants) |
-| `data/mockActionItems.ts` | 24 action items, 22 open |
+| `data/mockMeetings.ts` | Meeting records (re-exports types/constants) |
+| `data/mockMeetingContexts.ts`, `mockMeetingReviewData.ts`, `mockDecisionIntelligence.ts` | AI review detail for Meetings workspace |
+| `data/mockActionItems.ts` | Simple action item records (Home stats, sidebar badge) |
+| `data/mockActionWorkspace.ts` | Full action item workspace detail |
+| `data/mockCalendarEvents.ts`, `mockScheduleEvents.ts` | Calendar page events |
+| `data/mockDashboardInsights.ts` | Home "Today's Brief" panel content |
 
-Query helpers (`isMeetingUpcoming`, `getMeetingsThisWeekFrom`, etc.) live in `utils/meetings.ts`. Display metadata (duration, starts-in, artifacts) is derived in `utils/meetingMeta.ts` and `utils/actionItemMeta.ts`.
+Query helpers (`isMeetingUpcoming`, `getMeetingsThisWeekFrom`, etc.) live in `utils/meetings.ts`. Display metadata (duration, starts-in, artifacts) is derived in `utils/meetingMeta.ts`.
 
 ## Features Implemented
 
-- **Home** — Welcome header, animated stat cards, upcoming meetings (future-only), recent completed meeting with artifacts
-- **Meetings** — Search, date filters (Today / Tomorrow / This Week / Custom), list & grid views, auto-join master toggle (all / none / mixed)
-- **Action Items** — Search, status tabs, list & kanban views, priority/due badges, collapsible Done section
-- **Calendar** — Placeholder empty state + month preview grid
-- **Companion** — Floating button + slide-over panel (UI only)
-- **Responsive** — Sidebar collapses at tablet; bottom tab bar on mobile; companion clearance padding
+- **Home** — Welcome header, animated stat cards, upcoming meetings, "Today's Brief" AI insights panel
+- **Meetings** — Search, date filters (Today / Tomorrow / This Week / Custom), attention queue grouped by urgency, AI review workspace with decision intelligence, prep checklist for upcoming meetings, knowledge panel
+- **Action Items** — Search, status filters, action queue grouped by urgency, review detail with approval workflow, dependency/timeline tracking, knowledge panel
+- **Calendar** — Month / week / day views, mini calendar, executive brief sidebar
+- **AI Assistant** — Global floating button + draggable/resizable dialog, context-aware picker (mock responses only)
+- **Responsive** — Sidebar collapses at tablet; bottom tab bar on mobile
 
 ## Responsive Behaviour
 
@@ -90,17 +113,13 @@ Query helpers (`isMeetingUpcoming`, `getMeetingsThisWeekFrom`, etc.) live in `ut
 |------------|-----------|
 | `< 768px` | Bottom tab navigation; sidebar hidden |
 | `768–1023px` | Collapsed sidebar (64px); icon badges |
-| `≥ 1024px` | Full sidebar (220px) |
-
-Main content padding accounts for the companion FAB: `pb-44` mobile, `md:max-lg:pb-32` tablet, `lg:pb-8` desktop.
+| `≥ 1024px` | Full sidebar (~220px) |
 
 ## Known Limitations
 
-- No real API, auth, WebSocket, or AI responses
-- Email delivered stat (47) and some TopBar controls are static placeholders
-- Calendar is a non-functional preview
-- Search shortcuts (⌘K) are visual placeholders only
-- Action-item priority is mock-derived, not stored in data
+- No real API, auth, WebSocket, or AI responses — everything is mock data
+- "Emails Delivered" stat and some TopBar controls are static placeholders
+- Search is client-side filtering only, not a real search backend
 
 ## Future Backend Integration Points
 
@@ -110,11 +129,11 @@ Main content padding accounts for the companion FAB: `pb-44` mobile, `md:max-lg:
 | Auto-join | `PATCH /meetings/:id/auto-join` + bulk endpoint for master toggle |
 | Action items | `GET /action-items` with server-side status/priority |
 | Stats | `GET /dashboard/stats` for home cards |
-| Companion | WebSocket or SSE to `/companion/chat` |
+| AI Assistant | Real backend/LLM behind `POST /assistant/messages`, replacing the mock `buildResponse()` functions |
 | Calendar | OAuth + `GET /calendar/events` |
 | User | `GET /me` for TopBar profile and welcome name |
 
-Swap `MOCK_NOW_TIME` for server time in `utils/meetings.ts` and `utils/actionItemMeta.ts`.
+See `docs/HANDOFF.md` for full integration details, suggested endpoint shapes, and known CSS gotchas.
 
 ## How to Run
 
@@ -132,24 +151,8 @@ npm run build
 npm run preview   # optional — serve production build
 ```
 
-## Playwright Verification
-
-With the dev server running:
+## Lint
 
 ```bash
-node scripts/verify.mjs
+npm run lint
 ```
-
-Screenshots are written to `screenshots/verify/` covering desktop, tablet (800px), mobile (400px), kanban view, custom date filter, and layout fix confirmations.
-
-## Screenshots
-
-Reference captures live in `screenshots/verify/`:
-
-- `home-upcoming-sync.png`, `meetings-list-sync.png` — data consistency
-- `kanban-board.png` — action items kanban
-- `meetings-custom-chip.png`, `meetings-custom-date-filtered.png` — date filter
-- `tablet-800-*.png`, `mobile-400-*.png` — responsive layouts
-- `fix-sidebar-badge-collapsed.png`, `fix-kanban-companion-clearance.png` — layout QA
-
-Regenerate after UI changes with `node scripts/verify.mjs` while `npm run dev` is active.

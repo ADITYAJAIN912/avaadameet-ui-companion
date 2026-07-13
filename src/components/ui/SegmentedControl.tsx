@@ -13,13 +13,13 @@ interface SegmentedControlProps<T extends string> {
 }
 
 const trackSize = {
-  sm: 'h-7 p-0.5',
-  md: 'h-9 p-0.5',
+  sm: 'h-9 p-0.5',
+  md: 'h-11 p-1',
 } as const
 
 const segmentSize = {
-  sm: 'h-6 min-w-[2rem] px-2 text-small rounded-md',
-  md: 'h-8 min-w-[2.25rem] px-2.5 text-caption rounded-md',
+  sm: 'h-8 min-w-[2.5rem] px-3 text-caption rounded-md',
+  md: 'h-9 min-w-[2.75rem] px-3.5 text-body rounded-md',
 } as const
 
 /**
@@ -49,7 +49,7 @@ export function SegmentedControl<T extends string>({
             aria-pressed={active}
             className={`focus-ring inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors duration-150 ${segmentSize[size]} ${
               active
-                ? 'bg-white text-neutral-text'
+                ? 'bg-surface text-neutral-text'
                 : 'bg-transparent text-neutral-muted hover:text-neutral-text'
             }`}
           >

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Option A — Neo-Brutalism 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #FDF6EC;
+    --ink: #14120F;
+    --yellow: #FFD43D;
+    --blue: #3B6FF6;
+    --pink: #FF90C8;
+    --green: #3ECF6E;
+    --orange: #FF7A3D;
+    --shadow: 4px 4px 0 var(--ink);
+    --shadow-lg: 8px 8px 0 var(--ink);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(20,18,15,0.14) 1.5px, transparent 1.5px);
+    background-size: 26px 26px;
+  }
+
+  @keyframes popIn { from { opacity: 0; transform: translateY(24px) rotate(-1deg); } to { opacity: 1; transform: translateY(0) rotate(0); } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes wiggle { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+  .pop { animation: popIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .d1 { animation-delay: 0.05s; } .d2 { animation-delay: 0.12s; } .d3 { animation-delay: 0.19s; }
+  .d4 { animation-delay: 0.26s; } .d5 { animation-delay: 0.33s; }
+
+  header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+    background: var(--paper);
+    border-bottom: 3px solid var(--ink);
+  }
+  .logo { font-family: 'Archivo Black', sans-serif; font-size: 22px; letter-spacing: -0.5px; display:flex; align-items:center; gap:10px; }
+  .logo .dot { width: 16px; height: 16px; background: var(--blue); border: 3px solid var(--ink); border-radius: 50%; display:inline-block; animation: wiggle 2s ease-in-out infinite; }
+  nav { display: flex; gap: 8px; }
+  nav a {
+    text-decoration: none; color: var(--ink); font-weight: 600; font-size: 15px;
+    padding: 9px 18px; border: 3px solid transparent; border-radius: 12px;
+    transition: all 0.15s ease;
+  }
+  nav a.active { background: var(--yellow); border-color: var(--ink); box-shadow: var(--shadow); }
+  nav a:hover:not(.active) { border-color: var(--ink); transform: translate(-2px,-2px); }
+  .join-btn {
+    font-family: 'Space Grotesk'; font-weight: 700; font-size: 15px; cursor: pointer;
+    background: var(--blue); color: #fff; border: 3px solid var(--ink); border-radius: 12px;
+    padding: 10px 22px; box-shadow: var(--shadow); transition: all 0.15s ease;
+  }
+  .join-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+  .join-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--ink); }
+
+  .marquee { border-bottom: 3px solid var(--ink); background: var(--ink); color: var(--paper); overflow: hidden; white-space: nowrap; padding: 8px 0; }
+  .marquee-track { display: inline-block; animation: marquee 18s linear infinite; font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: 1px; }
+  .marquee-track span { margin: 0 24px; }
+  .marquee-track .hl { color: var(--yellow); }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 44px 28px 80px; position: relative; }
+
+  .kicker-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .sticker {
+    font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    background: var(--pink); border: 3px solid var(--ink); border-radius: 999px; padding: 6px 14px;
+    box-shadow: var(--shadow); transform: rotate(-2deg); display:inline-block;
+  }
+  h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(42px, 6vw, 72px); line-height: 1.02; letter-spacing: -1.5px; margin-bottom: 34px; }
+  h1 .outline { color: transparent; -webkit-text-stroke: 2.5px var(--ink); }
+
+  .grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #fff; border: 3px solid var(--ink); border-radius: 20px;
+    box-shadow: var(--shadow-lg); padding: 26px; position: relative;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;
+  }
+  .card:hover { transform: translate(-3px,-3px); box-shadow: 11px 11px 0 var(--ink); }
+  .card.yellow { background: var(--yellow); }
+  .card.blue { background: var(--blue); color: #fff; }
+  .card.green { background: var(--green); }
+
+  .tag { display:inline-flex; align-items:center; gap:8px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; background:#fff; border: 2.5px solid var(--ink); border-radius: 999px; padding: 5px 12px; color: var(--ink); }
+  .live-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--orange); border: 2px solid var(--ink); animation: blink 1.2s infinite; }
+
+  .hero-title { font-family:'Archivo Black'; font-size: 34px; line-height: 1.1; margin: 16px 0 8px; }
+  .hero-meta { font-family:'Space Mono',monospace; font-size: 14px; margin-bottom: 22px; }
+  .avatars { display: flex; margin: 18px 0; }
+  .avatars div { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--ink); margin-left: -12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size: 14px; background: var(--pink); }
+  .avatars div:first-child { margin-left: 0; }
+  .avatars div:nth-child(2) { background: var(--green); } .avatars div:nth-child(3) { background: var(--orange); } .avatars div:nth-child(4) { background: #fff; }
+
+  .big-join { display:block; width:100%; text-align:center; font-family:'Archivo Black'; font-size:20px; background: var(--ink); color: var(--yellow); border: 3px solid var(--ink); border-radius: 14px; padding: 16px; cursor:pointer; box-shadow: 5px 5px 0 rgba(20,18,15,0.25); transition: all 0.15s; }
+  .big-join:hover { transform: translate(-2px,-2px) rotate(-0.5deg); }
+
+  .stat-row { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .stat { border: 3px solid var(--ink); border-radius: 16px; background:#fff; padding: 18px; box-shadow: var(--shadow); }
+  .stat .num { font-family:'Archivo Black'; font-size: 40px; }
+  .stat .lbl { font-family:'Space Mono',monospace; font-size: 12px; letter-spacing: 0.5px; }
+
+  .timeline-item { display:flex; gap: 16px; align-items:center; padding: 14px 4px; border-bottom: 2.5px dashed rgba(20,18,15,0.3); }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-item .time { font-family:'Space Mono',monospace; font-weight:700; font-size: 13px; width: 74px; }
+  .timeline-item .chip { width: 14px; height: 14px; border-radius: 4px; border: 2.5px solid var(--ink); background: var(--blue); flex-shrink:0; }
+  .timeline-item:nth-child(3) .chip { background: var(--pink); } .timeline-item:nth-child(4) .chip { background: var(--green); } .timeline-item:nth-child(5) .chip { background: var(--orange); }
+  .timeline-item .name { font-weight: 600; font-size: 16px; }
+  .timeline-item:hover .name { text-decoration: underline 3px var(--yellow); text-underline-offset: 4px; }
+
+  h3.section { font-family:'Archivo Black'; font-size: 20px; margin-bottom: 14px; display:flex; align-items:center; gap:10px; }
+  h3.section .count { font-family:'Space Mono'; font-size: 13px; background: var(--yellow); border: 2.5px solid var(--ink); border-radius: 999px; padding: 3px 10px; }
+</style>
+</head>
+<body>
+  <header class="pop">
+    <div class="logo"><span class="dot"></span>AVAADA</div>
+    <nav>
+      <a class="active" href="#">Today</a>
+      <a href="#">Calendar</a>
+      <a href="#">Meetings</a>
+      <a href="#">Actions</a>
+    </nav>
+    <button class="join-btn">▶ Join next</button>
+  </header>
+
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>FRI JUN 29 2026</span><span class="hl">★ 5 MEETINGS TODAY</span><span>3 ACTIONS DUE</span><span class="hl">★ NEXT: PRODUCT SYNC 10:30</span><span>MODE: FOCUS ☀</span>
+      <span>FRI JUN 29 2026</span><span class="hl">★ 5 MEETINGS TODAY</span><span>3 ACTIONS DUE</span><span class="hl">★ NEXT: PRODUCT SYNC 10:30</span><span>MODE: FOCUS ☀</span>
+    </div>
+  </div>
+
+  <main>
+    <div class="kicker-row pop d1">
+      <span class="sticker">GOOD MORNING ☻</span>
+    </div>
+    <h1 class="pop d1">Hey Gyanpriya,<br /><span class="outline">5 meetings.</span> Let's go.</h1>
+
+    <div class="grid">
+      <div>
+        <div class="card yellow pop d2">
+          <span class="tag"><span class="live-dot"></span> STARTS IN 12 MIN</span>
+          <div class="hero-title">Product Sync — Q3 Roadmap</div>
+          <div class="hero-meta">10:30 → 11:15 · GMeet · Room 4B</div>
+          <div class="avatars"><div>RK</div><div>AS</div><div>MP</div><div>+4</div></div>
+          <button class="big-join">JOIN MEETING →</button>
+        </div>
+
+        <div class="card pop d4" style="margin-top: 24px;">
+          <h3 class="section">Today's lineup <span class="count">5</span></h3>
+          <div class="timeline-item"><span class="time">10:30</span><span class="chip"></span><span class="name">Product Sync — Q3 Roadmap</span></div>
+          <div class="timeline-item"><span class="time">12:00</span><span class="chip"></span><span class="name">Leadership standup</span></div>
+          <div class="timeline-item"><span class="time">14:30</span><span class="chip"></span><span class="name">Design review — Solar dashboard</span></div>
+          <div class="timeline-item"><span class="time">16:00</span><span class="chip"></span><span class="name">1:1 with Rahul</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="stat-row pop d3">
+          <div class="stat"><div class="num">3</div><div class="lbl">ACTIONS DUE</div></div>
+          <div class="stat" style="background: var(--pink);"><div class="num">2</div><div class="lbl">NEED PREP</div></div>
+        </div>
+        <div class="card blue pop d3">
+          <h3 class="section" style="color:#fff;">⚡ Needs attention</h3>
+          <p style="font-weight:600; font-size:16px; line-height:1.5;">Board deck review is <u>overdue by 2 days</u>. Finish before the 14:30 design review.</p>
+          <button class="join-btn" style="margin-top:18px; background: var(--yellow); color: var(--ink);">Fix it now →</button>
+        </div>
+        <div class="card green pop d5" style="margin-top: 24px;">
+          <h3 class="section">🤖 AI Companion</h3>
+          <p style="font-weight:600; font-size:15px; line-height:1.5;">"I drafted your prep notes for Product Sync. Want a 60-second brief?"</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

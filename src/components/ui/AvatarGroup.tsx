@@ -41,7 +41,7 @@ export function AvatarGroup({
       ))}
       {overflow > 0 && (
         <div
-          className={`flex items-center justify-center rounded-full border border-white/80 bg-neutral-border font-medium text-neutral-muted shadow-sm ring-2 ring-white ${overflowSize}`}
+          className={`flex items-center justify-center rounded-full border border-neutral-border bg-surface-raised font-medium text-neutral-muted shadow-sm ring-2 ring-surface ${overflowSize}`}
           aria-label={`${overflow} more attendees`}
         >
           +{overflow}
